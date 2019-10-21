@@ -1,0 +1,39 @@
+{
+  "name": "chemin",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/chemin.esm.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsdx build",
+    "start": "tsdx watch",
+    "test": "tsdx test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^24.0.19",
+    "tsdx": "^0.10.5",
+    "tslib": "^1.10.0"
+  },
+  "description": "A type-safe pattern builder / matching written in TypeScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/etienne-dldc/chemin.git"
+  },
+  "keywords": [
+    "router",
+    "pattern",
+    "path",
+    "ts",
+    "typescript"
+  ],
+  "bugs": {
+    "url": "https://github.com/etienne-dldc/chemin/issues"
+  },
+  "homepage": "https://github.com/etienne-dldc/chemin#readme"
+}
