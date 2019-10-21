@@ -84,6 +84,9 @@ function parsePattern<Params extends { [key: string]: string } = { [key: string]
     const isParam = strPart[0] === ':';
     const isOptional = strPart[strPart.length - 1] === '?';
     const name = strPart.slice(isParam ? 1 : 0, isOptional ? -1 : undefined);
+    if (isParam === false && isOptional) {
+      return CheminParams.optionalConst(name);
+    }
     const inner: CheminParams<string, any> = isParam ? CheminParams.string(name) : CheminParams.constant(name);
     return isOptional ? CheminParams.optional(inner) : inner;
   });

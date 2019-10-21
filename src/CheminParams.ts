@@ -83,11 +83,11 @@ function optional<N extends string, T extends any>(sub: CheminParams<N, T>): Che
 function optionalConst<N extends string>(name: N, constant: string = name): CheminParams<N, boolean> {
   return {
     name,
-    match: (value, ...rest) => {
-      if (value === constant) {
-        return { match: true, value: true, next: rest };
+    match: (...all) => {
+      if (all[0] === constant) {
+        return { match: true, value: true, next: all.slice(1) };
       }
-      return { match: true, value: false, next: [value, ...rest] };
+      return { match: true, value: false, next: all };
     },
     serialize: value => (value ? constant : null),
     stringify: () => `${constant}?`,
