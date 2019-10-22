@@ -8,6 +8,7 @@ export const Chemin = {
   stringify: stringifyPattern,
   is: isPattern,
   match: matchPattern,
+  matchExact: matchExactPattern,
 };
 
 type Part = CheminParams<any, any> | Chemin<any>;
@@ -103,6 +104,17 @@ export type CheminMatchResult<Params> = MatchResult<Params> | false;
 function matchPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<string>): CheminMatchResult<Params> {
   const pathParts = typeof pathname === 'string' ? CheminUtils.splitPathname(pathname) : pathname;
   return matchPart(pattern, pathParts);
+}
+
+function matchExactPattern<Params>(
+  pattern: Chemin<Params>,
+  pathname: string | Array<string>
+): CheminMatchResult<Params> {
+  const match = matchPattern(pattern, pathname);
+  if (match && match.rest.length === 0) {
+    return match;
+  }
+  return false;
 }
 
 function matchPart(part: Part, pathname: Array<string>): MatchResult<any> | false {
