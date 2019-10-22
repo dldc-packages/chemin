@@ -59,3 +59,10 @@ describe('Make sure different patterns return the correct match', () => {
     });
   });
 });
+
+test('serialize correctly', () => {
+  const postFragment = Chemin.create('post', P.number('postId'));
+  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+
+  expect(Chemin.stringify(postAdmin)).toBe('/admin/:userId/post/:postId(number)/edit');
+});

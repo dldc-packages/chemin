@@ -180,7 +180,7 @@ function stringifyPattern(pattern: Chemin<any>): string {
     pattern.parts
       .map((part): string => {
         if (isPattern(part)) {
-          return stringifyPattern(part);
+          return stringifyPattern(part).slice(1);
         }
         return part.stringify();
       })
