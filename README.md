@@ -4,7 +4,7 @@
 
 # 🥾 Chemin [![Build Status](https://travis-ci.org/etienne-dldc/chemin.svg?branch=master)](https://travis-ci.org/etienne-dldc/chemin)
 
-> A type-safe pattern builder / matching written in TypeScript
+> A type-safe pattern builder & route matching library written in TypeScript
 
 ## Gist
 

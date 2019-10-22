@@ -27,7 +27,7 @@
     "tslib": "^1.10.0",
     "typescript": "^3.6.4"
   },
-  "description": "A type-safe pattern builder / matching written in TypeScript",
+  "description": "A type-safe pattern builder & route matching library written in TypeScript",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/etienne-dldc/chemin.git"
