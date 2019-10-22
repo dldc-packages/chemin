@@ -106,13 +106,10 @@ function matchPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<
   return matchPart(pattern, pathParts);
 }
 
-function matchExactPattern<Params>(
-  pattern: Chemin<Params>,
-  pathname: string | Array<string>
-): CheminMatchResult<Params> {
+function matchExactPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<string>): false | Params {
   const match = matchPattern(pattern, pathname);
   if (match && match.rest.length === 0) {
-    return match;
+    return match.params;
   }
   return false;
 }
