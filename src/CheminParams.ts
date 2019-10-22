@@ -1,6 +1,6 @@
 export const CheminParams = {
   number,
-  interger,
+  integer,
   string,
   constant,
   optional,
@@ -49,7 +49,7 @@ function number<N extends string>(name: N): CheminParams<N, number> {
   };
 }
 
-function interger<N extends string>(name: N): CheminParams<N, number> {
+function integer<N extends string>(name: N): CheminParams<N, number> {
   return {
     name,
     match: (value, ...rest) => {

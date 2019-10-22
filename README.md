@@ -183,10 +183,10 @@ Chemin.matchExact(chemin, '/3.1415'); // { myNum: 3.1415 }
 
 #### CheminParams.number(name)
 
-> A interger using `parseInt(x, 10)`
+> A integer using `parseInt(x, 10)`
 
 ```ts
-const chemin = Chemin.create(CheminParams.interger('myInt'));
+const chemin = Chemin.create(CheminParams.integer('myInt'));
 Chemin.matchExact(chemin, '/42'); // { myInt: 42 }
 ```
 
@@ -214,7 +214,7 @@ Chemin.matchExact(chemin, '/'); // false
 > Make any `CheminParams` optional
 
 ```ts
-const chemin = Chemin.create(CheminParams.optional(CheminParams.interger('myInt')));
+const chemin = Chemin.create(CheminParams.optional(CheminParams.integer('myInt')));
 Chemin.matchExact(chemin, '/42'); // { myInt: { present: true, value: 42 } }
 Chemin.matchExact(chemin, '/'); // { myInt: { present: false } }
 ```
