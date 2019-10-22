@@ -1,5 +1,6 @@
 export const CheminParams = {
   number,
+  interger,
   string,
   constant,
   optional,
@@ -23,7 +24,7 @@ function string<N extends string>(name: N): CheminParams<N, string> {
   return {
     name,
     match: (value, ...rest) => {
-      if (typeof value === 'string') {
+      if (typeof value === 'string' && value.length > 0) {
         return { match: true, value: value, next: rest };
       }
       return { match: false };
@@ -38,6 +39,21 @@ function number<N extends string>(name: N): CheminParams<N, number> {
     name,
     match: (value, ...rest) => {
       const parsed = parseFloat(value);
+      if (Number.isNaN(parsed)) {
+        return { match: false };
+      }
+      return { match: true, value: parsed, next: rest };
+    },
+    serialize: value => value.toString(),
+    stringify: () => `:${name}(number)`,
+  };
+}
+
+function interger<N extends string>(name: N): CheminParams<N, number> {
+  return {
+    name,
+    match: (value, ...rest) => {
+      const parsed = parseInt(value, 10);
       if (Number.isNaN(parsed)) {
         return { match: false };
       }
