@@ -12,13 +12,20 @@
   "scripts": {
     "build": "tsdx build",
     "start": "tsdx watch",
-    "test": "tsdx test"
+    "test": "tsdx test",
+    "examples": "ts-node ./scripts/run-examples.ts"
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/fs-extra": "^8.0.1",
+    "@types/inquirer": "^6.5.0",
     "@types/jest": "^24.0.19",
+    "fs-extra": "^8.1.0",
+    "inquirer": "^7.0.0",
+    "ts-node": "^8.4.1",
     "tsdx": "^0.10.5",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.4"
   },
   "description": "A type-safe pattern builder / matching written in TypeScript",
   "repository": {
