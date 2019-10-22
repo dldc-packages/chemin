@@ -158,6 +158,10 @@ Accepts a `Chemin` and a `pathname` and return `false` or `CheminMatchResult`.
 
 Accepts the same arguments as `Chemin.match` but return `false` if the path does not match or if `rest` is not empty, otherwise it returns the `params` object directly.
 
+### Chemin.extract(chemin)
+
+Accepts a `Chemin` and return an array of all the `Chemin` it contains (as well as teh `Chemin` itself).
+
 ### CheminUtils.splitPathname(pathname)
 
 > Split a pathname and prevent empty parts

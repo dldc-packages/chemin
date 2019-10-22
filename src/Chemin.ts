@@ -9,6 +9,7 @@ export const Chemin = {
   is: isPattern,
   match: matchPattern,
   matchExact: matchExactPattern,
+  extract: extractPatterns,
 };
 
 type Part = CheminParams<any, any> | Chemin<any>;
@@ -195,4 +196,18 @@ function stringifyPattern(pattern: Chemin<any>): string {
       })
       .join('/')
   );
+}
+
+function extractPatterns(chemin: Chemin): Array<Chemin> {
+  const result: Array<Chemin> = [chemin];
+  function traverse(current: Part) {
+    if (isPattern(current)) {
+      if (result.indexOf(current) === -1) {
+        result.push(current);
+        current.parts.forEach(traverse);
+      }
+    }
+  }
+  chemin.parts.forEach(traverse);
+  return result;
 }

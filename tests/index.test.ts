@@ -66,3 +66,17 @@ test('serialize correctly', () => {
 
   expect(Chemin.stringify(postAdmin)).toBe('/admin/:userId/post/:postId(number)/edit');
 });
+
+test('extract chemins', () => {
+  const empty = Chemin.create();
+  const post = Chemin.create(empty, P.constant('post'));
+  const postFragment = Chemin.create(post, P.number('postId'));
+  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+
+  const result = Chemin.extract(postAdmin);
+  expect(result.length).toBe(4);
+  expect(result[0]).toBe(postAdmin);
+  expect(result[1]).toBe(postFragment);
+  expect(result[2]).toBe(post);
+  expect(result[3]).toBe(empty);
+});
