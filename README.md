@@ -38,3 +38,14 @@ console.log(match);
 console.log(match && match.params.postId); // postId is a number
 console.log(match && match.params.delete); // postId is a boolean
 ```
+
+## Composition
+
+```ts
+import { Chemin, CheminParams as P } from 'chemin';
+
+const postFragment = Chemin.create('post', P.number('postId'));
+const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+
+console.log(Chemin.stringify(postAdmin)); // /admin/:userId/post/:postId(number)/edit
+```
