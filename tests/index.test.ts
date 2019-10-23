@@ -110,3 +110,15 @@ test('toString', () => {
   expect(postFragment.toString()).toBe('/post/:postId(number)');
   expect(postAdmin.toString()).toBe('/admin/:userId/post/:postId(number)/edit');
 });
+
+test('createCreator', () => {
+  const create = Chemin.createCreator({ leadingSlash: false, trailingSlash: true });
+  const empty = create();
+  const post = create(empty, P.constant('post'));
+  const postFragment = create(post, P.number('postId'));
+  const postAdmin = create('admin', P.string('userId'), postFragment, 'edit');
+  expect(empty.serialize()).toBe('/');
+  expect(post.serialize()).toBe('post/');
+  expect(postFragment.serialize({ postId: 42 })).toBe('post/42/');
+  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe('admin/etienne/post/42/edit/');
+});
