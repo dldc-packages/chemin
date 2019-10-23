@@ -95,12 +95,15 @@ function parsePattern<Params extends { [key: string]: string } = { [key: string]
   return createPattern(...parts);
 }
 
-export interface MatchResult<Params> {
+export interface CheminMatch<Params> {
   params: Params;
   rest: Array<string>;
 }
 
-export type CheminMatchResult<Params> = MatchResult<Params> | false;
+export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
+
+// @deprecated
+export type CheminMatchResult<Params> = CheminMatchMaybe<Params>;
 
 function matchPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<string>): CheminMatchResult<Params> {
   const pathParts = typeof pathname === 'string' ? CheminUtils.splitPathname(pathname) : pathname;
@@ -115,7 +118,7 @@ function matchExactPattern<Params>(pattern: Chemin<Params>, pathname: string | A
   return false;
 }
 
-function matchPart(part: Part, pathname: Array<string>): MatchResult<any> | false {
+function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | false {
   if (isPattern(part)) {
     const match = matchNextParts(part.parts, pathname);
     if (match === false) {
@@ -138,7 +141,7 @@ function matchPart(part: Part, pathname: Array<string>): MatchResult<any> | fals
   };
 }
 
-function matchNextParts(parts: Array<Part>, pathname: Array<string>): MatchResult<any> | false {
+function matchNextParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<any> | false {
   if (parts.length === 0) {
     return { params: {}, rest: pathname };
   }
