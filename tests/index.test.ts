@@ -1,4 +1,4 @@
-import { Chemin, CheminParams as P, CheminMatchMaybe } from '../dist';
+import { Chemin, CheminParams as P, CheminMatchMaybe } from '../src';
 
 test('Serialize pattern', () => {
   const pattern = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
