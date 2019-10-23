@@ -38,7 +38,7 @@ export interface Chemin<Params = any> {
     ? ((params?: null, options?: SlashOptions) => string)
     : (params: Params, options?: SlashOptions) => string;
   match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
-  matchExact: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
+  matchExact: (pathname: string | Array<string>) => Params | false;
   extract: () => Array<Chemin>;
   toString: () => string;
 }
