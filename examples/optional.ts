@@ -1,5 +1,5 @@
-import { Chemin, CheminParams } from '../dist';
+import { Chemin, CheminParam } from '../src';
 
-const chemin = Chemin.create(CheminParams.optional(CheminParams.integer('myInt')));
-console.log(Chemin.matchExact(chemin, '/42')); // { myInt: { present: true, value: 42 } }
-console.log(Chemin.matchExact(chemin, '/')); // { myInt: { present: false } }
+const chemin = Chemin.create(CheminParam.optional(CheminParam.integer('myInt')));
+console.log(chemin.matchExact('/42')); // { myInt: { present: true, value: 42 } }
+console.log(chemin.matchExact('/')); // { myInt: { present: false } }

@@ -1,4 +1,4 @@
-import { Chemin, CheminParams } from '../dist';
+import { Chemin, CheminParam } from '../src';
 
 interface CustomId {
   num: number;
@@ -6,7 +6,7 @@ interface CustomId {
 }
 
 // match id 45-paul
-function customId<N extends string>(name: N): CheminParams<N, CustomId> {
+function customId<N extends string>(name: N): CheminParam<N, CustomId> {
   return {
     name,
     match: (...all) => {
@@ -24,7 +24,7 @@ function customId<N extends string>(name: N): CheminParams<N, CustomId> {
     serialize: value => {
       return `${value.num}-${value.name}`;
     },
-    stringify: () => `:${name}(customId)`,
+    toString: () => `:${name}(customId)`,
   };
 }
 

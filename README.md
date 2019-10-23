@@ -11,28 +11,28 @@
 ```js
 import { Chemin } from 'chemin';
 
-const path = Chemin.parse('/admin/post/:postId/delete?');
+const chemin = Chemin.parse('/admin/post/:postId/delete?');
 
-console.log(Chemin.match(path, '/no/valid'));
+console.log(chemin.match('/no/valid'));
 // => false
 
-console.log(Chemin.match(path, '/admin/post/e5t89u'));
+console.log(chemin.match('/admin/post/e5t89u'));
 // => { rest: [], params: { postId: 'e5t89u', delete: false } }
 ```
 
 ## More advanced (and type-safe) patterns
 
-Use the `Chemin.create` and `CheminParams` to build more complex **type-safe** paths !
+Use the `Chemin.create` and `CheminParam` to build more complex **type-safe** paths !
 
 ```ts
-import { Chemin, CheminParams as P } from 'chemin';
+import { Chemin, CheminParam as P } from 'chemin';
 
-const path = Chemin.create('admin', 'post', P.number('postId'), P.optionalConst('delete'));
+const chemin = Chemin.create('admin', 'post', P.number('postId'), P.optionalConst('delete'));
 
-console.log(Chemin.match(path, '/no/valid'));
+console.log(chemin.match('/no/valid'));
 // => false
 
-const match = Chemin.match(path, '/admin/post/45');
+const match = chemin.match('/admin/post/45');
 console.log(match);
 // => { rest: [], params: { postId: 45, delete: false } }
 ```
@@ -42,24 +42,24 @@ console.log(match);
 You can use a `Chemin` inside another to easily compose your routes !
 
 ```ts
-import { Chemin, CheminParams as P } from 'chemin';
+import { Chemin, CheminParam as P } from 'chemin';
 
 const postFragment = Chemin.create('post', P.number('postId'));
 const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
 
-console.log(Chemin.stringify(postAdmin)); // /admin/:userId/post/:postId(number)/edit
+console.log(postAdmin.toString()); // /admin/:userId/post/:postId(number)/edit
 ```
 
-## Custom `CheminParams`
+## Custom `CheminParam`
 
-You can create your own `CheminParams` to match better fit your application while keeping full type-safety !
+You can create your own `CheminParam` to better fit your application while keeping full type-safety !
 
 ```ts
-import { Chemin, CheminParams } from 'chemin';
+import { Chemin, CheminParam } from 'chemin';
 
 // match only string of 4 char [a-z0-9]
-function fourCharStringId<N extends string>(name: N): CheminParams<N, string> {
-  const reg = /[a-z0-9]{4}/;
+function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
+  const reg = /^[a-z0-9]{4}$/;
   return {
     name,
     match: (...all) => {
@@ -69,18 +69,18 @@ function fourCharStringId<N extends string>(name: N): CheminParams<N, string> {
       return { match: false, next: all };
     },
     serialize: value => value,
-    stringify: () => `:${name}(id4)`,
+    toString: () => `:${name}(id4)`,
   };
 }
 
 const path = Chemin.create('item', fourCharStringId('itemId'));
-console.log(Chemin.match(path, '/item/a4e3t')); // false (5 char)
-console.log(Chemin.match(path, '/item/A4e3')); // false (Maj)
-console.log(Chemin.match(path, '/item/a4e3')); // { rest: [], params: { itemId: 'a4e3' } }
+console.log(path.match('/item/a4e3t')); // false (5 char)
+console.log(path.match('/item/A4e3')); // false (Maj)
+console.log(path.match('/item/a4e3')); // { rest: [], params: { itemId: 'a4e3' } }
 ```
 
-Take a look a [the custom-advanced.ts example](https://github.com/etienne-dldc/chemin/blob/master/examples/custom-advanced.ts).
-Also take a look at [the build-in CheminParams](https://github.com/etienne-dldc/chemin/blob/master/src/CheminParams.ts#L22).
+> Take a look a [the custom-advanced.ts example](https://github.com/etienne-dldc/chemin/blob/master/examples/custom-advanced.ts).
+> and [the build-in CheminParam](https://github.com/etienne-dldc/chemin/blob/master/src/CheminParam.ts#L23).
 
 ## API
 
@@ -92,10 +92,10 @@ Accepts a `string` (`/admin/:user/edit?`) and return a `Chemin`.
 
 #### Supported patterns
 
-- `admin`: Create a `CheminParams.constant('admin')`
-- `:param`: Create a `CheminParams.string('param')`
-- `maybe?`: Create a `CheminParams.optionalConst('maybe')`
-- `:maybe?`: Create a `CheminParams.optional(CheminParams.string('maybe'))`
+- `admin`: Create a `CheminParam.constant('admin')`
+- `:param`: Create a `CheminParam.string('param')`
+- `maybe?`: Create a `CheminParam.optionalConst('maybe')`
+- `:maybe?`: Create a `CheminParam.optionalString('maybe')`
 
 ```ts
 Chemin.parse('/admin/:userId/edit?');
@@ -105,62 +105,90 @@ Chemin.parse('/admin/:userId/edit?');
 
 > Create a `Chemin`
 
-Accepts any number or arguments of type `string`, `CheminParams` or `Chemin`.
+Accepts any number or arguments of type `string`, `CheminParam` or `Chemin`.
 
-**Note**: strings are converted to `CheminParams.constant`.
-
-```ts
-Chemin.create('admin', CheminParams.number('userId'), CheminParams.optionalConst('edit'));
-```
-
-### Chemin.serialize(chemin, params)
-
-> Serialize a chemin
-
-Accepts a `Chemin` and some params adn output a string.
+**Note**: strings are converted to `CheminParam.constant`.
 
 ```ts
-const chemin = Chemin.create('admin', CheminParams.number('userId'), CheminParams.optionalConst('edit'));
-Chemin.serialize(chemin, { userId: 42, edit: true }); // /admin/42/edit
+Chemin.create('admin', CheminParam.number('userId'), CheminParam.optionalConst('edit'));
 ```
 
-### Chemin.stringify(chemin)
+### Chemin.isChemin(maybe)
 
-> Convert a chemin to a human readable string
-
-Accepts a single `Chemin` and return a `string`.
-
-```ts
-const chemin = Chemin.create('admin', CheminParams.number('userId'), CheminParams.optionalConst('edit'));
-Chemin.stringify(chemin); // /admin/:userId(number)/edit?
-```
-
-### Chemin.is(maybe)
-
-> Test wether an object is `Chemin` or not
+> Test wether an object is a `Chemin` or not
 
 Accepts one argument and return `true` if it's a `Chemin`, false otherwise.
 
-### Chemin.match(chemin, pathname)
+```ts
+Chemin.isChemin(Chemin.parse('/admin')); // true
+```
+
+### chemin.parts
+
+> An array of the parts (other `Chemin`s or `CheminParam`s) that make the chemin.
+
+**Note**: You probably don't need this.
+
+**Note 2**: You should not mutate this array or any of it's elements !
+
+### chemin.serialize(params?, options?)
+
+> Serialize a chemin
+
+Accepts some `params` (an object or `null`) and an optional `option` object.
+
+The option object accepts two `boolean` properties:
+
+- `leadingSlash` (default `true`): Add a slash at the begining
+- `trailingSlash` (default: `false`): Add a slash at the end
+
+```ts
+const chemin = Chemin.create('admin', CheminParam.number('userId'), CheminParam.optionalConst('edit'));
+chemin.serialize({ userId: 42, edit: true }); // /admin/42/edit
+```
+
+### chemin.match(pathname)
 
 > Test a chemin against a pathanme
 
-Accepts a `Chemin` and a `pathname` and return `false` or `CheminMatchResult`.
+Accepts a `pathname` and return `false` or `CheminMatchResult`.
 
 - `pathname` can be either a string (`/admin/user/5`) or an array of strings (`['admin', 'user', '5']`)
 - `CheminMatchResult` is an object with two properties
-  - `rest`: an array of string of the remaining parts of the pathname once teh matching was done
+  - `rest`: an array of string of the remaining parts of the pathname once the matching is done
   - `params`: an object of params extracted from the matching
 
 **Note**: If you want to pass an array to `pathname` make sure to use `CheminUtils.splitPathname`.
 
-### Chemin.matchExact(chemin, pathname)
+### chemin.matchExact(pathname)
 
-Accepts the same arguments as `Chemin.match` but return `false` if the path does not match or if `rest` is not empty, otherwise it returns the `params` object directly.
+Accepts the same arguments as `chemin.match` but return `false` if the path does not match or if `rest` is not empty, otherwise it returns the `params` object directly.
 
-### Chemin.extract(chemin)
+### chemin.extract()
 
-Accepts a `Chemin` and return an array of all the `Chemin` it contains (as well as teh `Chemin` itself).
+Return an array of all the `Chemin` it contains (as well as the `Chemin` itself).
+
+```ts
+import { Chemin } from 'chemin';
+
+const admin = Chemin.create('admin');
+const adminUser = Chemin.create(admin, 'user');
+
+adminUser.extract(); // [adminUser, admin];
+```
+
+### chemin.toString()
+
+Return a string representation of the chemin.
+
+```ts
+import { Chemin, CheminParam as P } from 'chemin';
+
+const postFragment = Chemin.create('post', P.number('postId'));
+const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+
+console.log(postAdmin.toString()); // /admin/:userId/post/:postId(number)/edit
+```
 
 ### CheminUtils.splitPathname(pathname)
 
@@ -172,63 +200,63 @@ Accepts a string and returns an array od strings.
 CheminUtils.splitPathname('/admin/user/5'); // ['admin', 'user', '5']
 ```
 
-### CheminParams
+### CheminParam
 
-The `CheminParams` object contains the build-in `CheminParams`.
+The `CheminParam` object contains the build-in `CheminParam`.
 
-#### CheminParams.number(name)
+#### CheminParam.number(name)
 
 > A number using `parseFloat(x)`
 
 ```ts
-const chemin = Chemin.create(CheminParams.number('myNum'));
+const chemin = Chemin.create(CheminParam.number('myNum'));
 Chemin.matchExact(chemin, '/3.1415'); // { myNum: 3.1415 }
 ```
 
-#### CheminParams.number(name)
+#### CheminParam.integer(name)
 
 > A integer using `parseInt(x, 10)`
 
 ```ts
-const chemin = Chemin.create(CheminParams.integer('myInt'));
+const chemin = Chemin.create(CheminParam.integer('myInt'));
 Chemin.matchExact(chemin, '/42'); // { myInt: 42 }
 ```
 
-#### CheminParams.string(name)
+#### CheminParam.string(name)
 
 > Any non-empty string
 
 ```ts
-const chemin = Chemin.create(CheminParams.string('myStr'));
+const chemin = Chemin.create(CheminParam.string('myStr'));
 Chemin.matchExact(chemin, '/cat'); // { myStr: 'cat' }
 ```
 
-#### CheminParams.constant(name)
+#### CheminParam.constant(name)
 
 > A constant string
 
 ```ts
-const chemin = Chemin.create(CheminParams.constant('edit'));
+const chemin = Chemin.create(CheminParam.constant('edit'));
 Chemin.matchExact(chemin, '/edit'); // {}
 Chemin.matchExact(chemin, '/'); // false
 ```
 
-#### CheminParams.optional(cheminParam)
+#### CheminParam.optional(cheminParam)
 
-> Make any `CheminParams` optional
+> Make any `CheminParam` optional
 
 ```ts
-const chemin = Chemin.create(CheminParams.optional(CheminParams.integer('myInt')));
+const chemin = Chemin.create(CheminParam.optional(CheminParam.integer('myInt')));
 Chemin.matchExact(chemin, '/42'); // { myInt: { present: true, value: 42 } }
 Chemin.matchExact(chemin, '/'); // { myInt: { present: false } }
 ```
 
-#### CheminParams.optionalConst(name, path?)
+#### CheminParam.optionalConst(name, path?)
 
 > An optional contant string
 
 ```ts
-const chemin = Chemin.create(CheminParams.optionalConst('isEditing', 'edit'));
+const chemin = Chemin.create(CheminParam.optionalConst('isEditing', 'edit'));
 Chemin.matchExact(chemin, '/edit'); // { isEditing: true }
 Chemin.matchExact(chemin, '/'); // { isEditing: false }
 ```
@@ -236,23 +264,33 @@ Chemin.matchExact(chemin, '/'); // { isEditing: false }
 If `path` is omitted then the name is used as the path.
 
 ```ts
-const chemin = Chemin.create(CheminParams.optionalConst('edit'));
+const chemin = Chemin.create(CheminParam.optionalConst('edit'));
 Chemin.matchExact(chemin, '/edit'); // { edit: true }
 Chemin.matchExact(chemin, '/'); // { edit: false }
 ```
 
-#### CheminParams.multiple(cheminParam, atLeastOne?)
+#### CheminParam.optionalString(name)
+
+> An optional string parameter
+
+```ts
+const chemin = Chemin.create(CheminParam.optionalString('name'));
+Chemin.matchExact(chemin, '/paul'); // { name: 'paul' }
+Chemin.matchExact(chemin, '/'); // { name: false }
+```
+
+#### CheminParam.multiple(cheminParam, atLeastOne?)
 
 > Allow a params to be repeated any number of time
 
 ```ts
-const chemin = Chemin.create(CheminParams.multiple(CheminParams.string('categories')));
+const chemin = Chemin.create(CheminParam.multiple(CheminParam.string('categories')));
 Chemin.matchExact(chemin, '/'); // { categories: [] }
 Chemin.matchExact(chemin, '/foo/bar'); // { categories: ['foo', 'bar'] }
 ```
 
 ```ts
-const chemin = Chemin.create(CheminParams.multiple(CheminParams.string('categories'), true));
+const chemin = Chemin.create(CheminParam.multiple(CheminParam.string('categories'), true));
 Chemin.matchExact(chemin, '/'); // false because atLeastOne is true
 Chemin.matchExact(chemin, '/foo/bar'); // { categories: ['foo', 'bar'] }
 ```

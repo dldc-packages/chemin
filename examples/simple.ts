@@ -1,9 +1,9 @@
-import { Chemin } from '../dist';
+import { Chemin } from '../src';
 
-const path = Chemin.parse('/admin/post/:postId/delete?');
+const chemin = Chemin.parse('/admin/post/:postId/delete?');
 
-console.log(Chemin.match(path, '/no/valid'));
+console.log(chemin.match('/no/valid'));
 // => false
 
-console.log(Chemin.match(path, '/admin/post/e5t89u'));
+console.log(chemin.match('/admin/post/e5t89u'));
 // => { rest: [], params: { postId: 'e5t89u', delete: false } }

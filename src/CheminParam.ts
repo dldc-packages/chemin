@@ -1,26 +1,27 @@
-export const CheminParams = {
+export const CheminParam = {
   number,
   integer,
   string,
   constant,
   optional,
   optionalConst,
+  optionalString,
   multiple,
 };
 
 type PartMatchResult<T> = { match: false } | { match: true; value: T extends void ? null : T; next: Array<string> };
 type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
 type PartSerialize<T> = (value: T) => string | null;
-type PartStringify = () => string;
+type PartToString = () => string;
 
-export type CheminParams<N extends string, T> = {
+export type CheminParam<N extends string, T> = {
   name: N;
   match: PartMatch<T>;
-  stringify: PartStringify;
+  toString: PartToString;
   serialize: PartSerialize<T>;
 } & (T extends void ? { noValue: true } : {});
 
-function string<N extends string>(name: N): CheminParams<N, string> {
+function string<N extends string>(name: N): CheminParam<N, string> {
   return {
     name,
     match: (value, ...rest) => {
@@ -30,11 +31,11 @@ function string<N extends string>(name: N): CheminParams<N, string> {
       return { match: false };
     },
     serialize: value => value.toString(),
-    stringify: () => `:${name}`,
+    toString: () => `:${name}`,
   };
 }
 
-function number<N extends string>(name: N): CheminParams<N, number> {
+function number<N extends string>(name: N): CheminParam<N, number> {
   return {
     name,
     match: (value, ...rest) => {
@@ -45,11 +46,11 @@ function number<N extends string>(name: N): CheminParams<N, number> {
       return { match: true, value: parsed, next: rest };
     },
     serialize: value => value.toString(),
-    stringify: () => `:${name}(number)`,
+    toString: () => `:${name}(number)`,
   };
 }
 
-function integer<N extends string>(name: N): CheminParams<N, number> {
+function integer<N extends string>(name: N): CheminParam<N, number> {
   return {
     name,
     match: (value, ...rest) => {
@@ -60,11 +61,11 @@ function integer<N extends string>(name: N): CheminParams<N, number> {
       return { match: true, value: parsed, next: rest };
     },
     serialize: value => value.toString(),
-    stringify: () => `:${name}(number)`,
+    toString: () => `:${name}(number)`,
   };
 }
 
-function constant<N extends string>(name: N): CheminParams<N, void> {
+function constant<N extends string>(name: N): CheminParam<N, void> {
   return {
     name,
     noValue: true,
@@ -75,13 +76,13 @@ function constant<N extends string>(name: N): CheminParams<N, void> {
       return { match: false };
     },
     serialize: () => name,
-    stringify: () => name,
+    toString: () => name,
   };
 }
 
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
-function optional<N extends string, T extends any>(sub: CheminParams<N, T>): CheminParams<N, OptionalValue<T>> {
+function optional<N extends string, T extends any>(sub: CheminParam<N, T>): CheminParam<N, OptionalValue<T>> {
   return {
     name: sub.name,
     match: (...all) => {
@@ -92,11 +93,11 @@ function optional<N extends string, T extends any>(sub: CheminParams<N, T>): Che
       return { match: true, value: { present: false }, next: all };
     },
     serialize: value => (value.present ? sub.serialize(value.value) : null),
-    stringify: () => `${sub.stringify()}?`,
+    toString: () => `${sub.toString()}?`,
   };
 }
 
-function optionalConst<N extends string>(name: N, constant: string = name): CheminParams<N, boolean> {
+function optionalConst<N extends string>(name: N, constant: string = name): CheminParam<N, boolean> {
   return {
     name,
     match: (...all) => {
@@ -106,14 +107,28 @@ function optionalConst<N extends string>(name: N, constant: string = name): Chem
       return { match: true, value: false, next: all };
     },
     serialize: value => (value ? constant : null),
-    stringify: () => `${constant}?`,
+    toString: () => `${constant}?`,
+  };
+}
+
+function optionalString<N extends string>(name: N): CheminParam<N, string | false> {
+  return {
+    name,
+    match: (...all) => {
+      if (typeof all[0] === 'string' && all[0].length > 0) {
+        return { match: true, value: all[0], next: all.slice(1) };
+      }
+      return { match: true, value: false, next: all };
+    },
+    serialize: value => (value === false ? null : value),
+    toString: () => `:${name}?`,
   };
 }
 
 function multiple<N extends string, T extends any>(
-  sub: CheminParams<N, T>,
+  sub: CheminParam<N, T>,
   atLeastOne: boolean = false
-): CheminParams<N, Array<T>> {
+): CheminParam<N, Array<T>> {
   return {
     name: sub.name,
     match: (...all) => {
@@ -133,6 +148,6 @@ function multiple<N extends string, T extends any>(
       return { match: true, value: values, next };
     },
     serialize: value => value.map(v => sub.serialize(v)).join('/'),
-    stringify: () => `${sub.stringify()}${atLeastOne ? '+' : '*'}`,
+    toString: () => `${sub.toString()}${atLeastOne ? '+' : '*'}`,
   };
 }

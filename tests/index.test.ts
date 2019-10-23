@@ -1,21 +1,22 @@
-import { Chemin, CheminParams as P, CheminMatchMaybe } from '../src';
+import { Chemin, CheminParam as P, CheminMatchMaybe } from '../src';
 
-test('Serialize pattern', () => {
-  const pattern = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
-  expect(Chemin.stringify(pattern)).toBe('/admin/:user/:nums(number)*');
+test('Serialize chemin', () => {
+  const chemin = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
+  expect(chemin.toString()).toBe('/admin/:user/:nums(number)*');
 });
 
-test('Parse then serialize', () => {
-  const pattern = Chemin.parse('/user/settings/:setting/advanced?');
-  expect(Chemin.stringify(pattern)).toBe('/user/settings/:setting/advanced?');
+test('Parse then toString', () => {
+  const chemin = Chemin.parse('/user/settings/:setting/advanced?');
+  expect(chemin.toString()).toBe('/user/settings/:setting/advanced?');
 });
 
-describe('Make sure different patterns return the correct match', () => {
-  const data: Array<{ pattern: Chemin; tests: Array<[string, CheminMatchMaybe<any>]> }> = [
+describe('Make sure different chemins return the correct match', () => {
+  const data: Array<{ chemin: Chemin; tests: Array<[string, CheminMatchMaybe<any>]> }> = [
     {
-      pattern: Chemin.parse('/'),
+      chemin: Chemin.parse('/'),
       tests: [
         ['/', { params: {}, rest: [] }],
+        ['//', { params: {}, rest: [''] }],
         ['', { params: {}, rest: [] }],
         ['/foo', { params: {}, rest: ['foo'] }],
         ['/foo/', { params: {}, rest: ['foo'] }],
@@ -24,7 +25,7 @@ describe('Make sure different patterns return the correct match', () => {
       ],
     },
     {
-      pattern: Chemin.parse('/admin'),
+      chemin: Chemin.parse('/admin'),
       tests: [
         ['/', false],
         ['', false],
@@ -37,7 +38,7 @@ describe('Make sure different patterns return the correct match', () => {
       ],
     },
     {
-      pattern: Chemin.create('admin', P.optional(P.string('tool'))),
+      chemin: Chemin.create('admin', P.optional(P.string('tool'))),
       tests: [
         ['/', false],
         ['', false],
@@ -50,21 +51,14 @@ describe('Make sure different patterns return the correct match', () => {
   ];
 
   data.forEach(data => {
-    describe(`Test ${Chemin.stringify(data.pattern)}`, () => {
+    describe(`Test ${data.chemin}`, () => {
       data.tests.forEach(v => {
         test(`'${v[0]}'`, () => {
-          expect(Chemin.match(data.pattern, v[0])).toEqual(v[1]);
+          expect(data.chemin.match(v[0])).toEqual(v[1]);
         });
       });
     });
   });
-});
-
-test('serialize correctly', () => {
-  const postFragment = Chemin.create('post', P.number('postId'));
-  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
-
-  expect(Chemin.stringify(postAdmin)).toBe('/admin/:userId/post/:postId(number)/edit');
 });
 
 test('extract chemins', () => {
@@ -73,7 +67,7 @@ test('extract chemins', () => {
   const postFragment = Chemin.create(post, P.number('postId'));
   const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
 
-  const result = Chemin.extract(postAdmin);
+  const result = postAdmin.extract();
   expect(result.length).toBe(4);
   expect(result[0]).toBe(postAdmin);
   expect(result[1]).toBe(postFragment);
@@ -91,4 +85,28 @@ test('serialize', () => {
   expect(post.serialize()).toBe('/post');
   expect(postFragment.serialize({ postId: 42 })).toBe('/post/42');
   expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe('/admin/etienne/post/42/edit');
+});
+
+test('serialize options', () => {
+  const empty = Chemin.create();
+  const post = Chemin.create(empty, P.constant('post'));
+  const postFragment = Chemin.create(post, P.number('postId'));
+  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' }, { leadingSlash: false, trailingSlash: true })).toBe(
+    'admin/etienne/post/42/edit/'
+  );
+  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: true })).toBe('/');
+  expect(empty.serialize(null, { leadingSlash: true, trailingSlash: true })).toBe('/');
+  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: false })).toBe('');
+});
+
+test('toString', () => {
+  const empty = Chemin.create();
+  const post = Chemin.create(empty, P.constant('post'));
+  const postFragment = Chemin.create(post, P.number('postId'));
+  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+  expect(empty.toString()).toBe('/');
+  expect(post.toString()).toBe('/post');
+  expect(postFragment.toString()).toBe('/post/:postId(number)');
+  expect(postAdmin.toString()).toBe('/admin/:userId/post/:postId(number)/edit');
 });

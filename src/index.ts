@@ -1,3 +1,3 @@
 export { Chemin, CheminMatchMaybe, CheminMatch } from './Chemin';
-export { CheminParams } from './CheminParams';
+export { CheminParam } from './CheminParam';
 export { CheminUtils } from './CheminUtils';

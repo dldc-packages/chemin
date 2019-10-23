@@ -1,4 +1,4 @@
-import { Chemin, CheminParams } from '../dist';
+import { Chemin, CheminParam } from '../src';
 
-const chemin = Chemin.create(CheminParams.number('myNum'));
-console.log(Chemin.matchExact(chemin, '/3.1415')); // { myNum: 3.1415 }
+const chemin = Chemin.create(CheminParam.number('myNum'));
+console.log(chemin.matchExact('/3.1415')); // { myNum: 3.1415 }

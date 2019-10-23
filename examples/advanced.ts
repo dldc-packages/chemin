@@ -1,7 +1,7 @@
-import { Chemin, CheminParams as P } from '../dist';
+import { Chemin, CheminParam as P } from '../src';
 
 function matchExact<Params>(chemin: Chemin<Params>, pathname: string): Params | false {
-  const match = Chemin.match(chemin, pathname);
+  const match = chemin.match(pathname);
   if (match !== false && match.rest.length === 0) {
     return match.params;
   }
@@ -36,8 +36,8 @@ type MatchAllResult<T> = T extends Chemin<infer P>
     };
 
 function matchAll<T>(obj: T, pathname: string): MatchAllResult<T> {
-  if (Chemin.is(obj)) {
-    return matchExact(obj, pathname);
+  if (Chemin.isChemin(obj)) {
+    return matchExact(obj, pathname) as any;
   }
   return Object.keys(obj).reduce<any>((acc, key) => {
     acc[key] = matchAll((obj as any)[key], pathname);
