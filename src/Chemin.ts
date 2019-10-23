@@ -18,6 +18,8 @@ type Params<T> = T extends string
   ? {}
   : T extends Chemin<infer P>
   ? P
+  : T extends CheminParams<any, void>
+  ? {}
   : T extends CheminParams<infer N, infer P>
   ? { [K in N]: P }
   : {};
@@ -25,8 +27,13 @@ type Params<T> = T extends string
 const IS_PATTERN = Symbol('IS_PATTERN');
 
 export interface Chemin<Params = any> {
-  parts: Array<Part>;
   [IS_PATTERN]: Params;
+  parts: Array<Part>;
+  serialize: {} extends Params ? (() => string) : (params: Params) => string;
+  stringify: () => string;
+  match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
+  matchExact: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
+  extract: () => Array<Chemin>;
 }
 
 type In = string | CheminParams<any, any> | Chemin<any>;
@@ -35,47 +42,53 @@ function isPattern(maybe: any): maybe is Chemin<any> {
   return maybe && maybe[IS_PATTERN];
 }
 
-type Pat<P> = Chemin<P>;
-
 /**
  const r = num=>Array(num).fill(null).map((v,i)=>i);
- const res = r(10).map(count=> count === 0 ? (`function createPattern(): Pat<{}>;`) : (`function createPattern<${r(count).map(i=>`P${i} extends In`).join(', ')}>(${r(count).map(i=>`p${i}: P${i}`).join(', ')}): Pat<${r(count).map(i=>`Params<P${i}>`).join(' & ')}>;`)).map(v=>`// prettier-ignore\n${v}`).join('\n');
+ const res = r(10).map(count=> count === 0 ? (`function createPattern(): Chemin<{}>;`) : (`function createPattern<${r(count).map(i=>`P${i} extends In`).join(', ')}>(${r(count).map(i=>`p${i}: P${i}`).join(', ')}): Chemin<${r(count).map(i=>`Params<P${i}>`).join(' & ')}>;`)).map(v=>`// prettier-ignore\n${v}`).join('\n');
 
  */
 
 // prettier-ignore
+function createPattern(): Chemin<{}>;
 // prettier-ignore
-function createPattern(): Pat<{}>;
+function createPattern<P0 extends In>(p0: P0): Chemin<Params<P0>>;
 // prettier-ignore
-function createPattern<P0 extends In>(p0: P0): Pat<Params<P0>>;
+function createPattern<P0 extends In, P1 extends In>(p0: P0, p1: P1): Chemin<Params<P0> & Params<P1>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In>(p0: P0, p1: P1): Pat<Params<P0> & Params<P1>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In>(p0: P0, p1: P1, p2: P2): Chemin<Params<P0> & Params<P1> & Params<P2>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In>(p0: P0, p1: P1, p2: P2): Pat<Params<P0> & Params<P1> & Params<P2>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In>(p0: P0, p1: P1, p2: P2, p3: P3): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In>(p0: P0, p1: P1, p2: P2, p3: P3): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7>>;
 // prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7>>;
-// prettier-ignore
-function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In, P8 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8): Pat<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7> & Params<P8>>;
+function createPattern<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In, P8 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7> & Params<P8>>;
 
-function createPattern(...parts: Array<In>): Chemin<any>;
-function createPattern(...parts: Array<In>): Chemin<any> {
-  return {
-    parts: parts.map(part => {
-      if (typeof part === 'string') {
-        return CheminParams.constant(part);
-      }
-      return part;
-    }),
+function createPattern(...fragments: Array<In>): Chemin<any>;
+function createPattern(...fragments: Array<In>): Chemin<any> {
+  const parts = fragments.map(part => {
+    if (typeof part === 'string') {
+      return CheminParams.constant(part);
+    }
+    return part;
+  });
+
+  const chemin: Chemin<any> = {
     [IS_PATTERN]: true,
+    parts,
+    serialize: ((params: any) => serializePattern(chemin, params)) as any,
+    extract: () => extractPatterns(chemin),
+    match: pathname => matchPattern(chemin, pathname),
+    matchExact: pathname => matchExactPattern(chemin, pathname),
+    stringify: () => stringifyPattern(chemin),
   };
+
+  return chemin;
 }
 
 function parsePattern<Params extends { [key: string]: string } = { [key: string]: string }>(
@@ -171,7 +184,7 @@ function serializePattern(pattern: Chemin<any>, params: any = {}): string {
   const result = pattern.parts
     .map(part => {
       if (isPattern(part)) {
-        return serializePattern(part, params);
+        return serializePattern(part, params).slice(1);
       }
       const value = params[part.name];
       return part.serialize(value);
