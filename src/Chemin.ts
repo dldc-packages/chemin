@@ -102,10 +102,7 @@ export interface CheminMatch<Params> {
 
 export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
 
-// @deprecated
-export type CheminMatchResult<Params> = CheminMatchMaybe<Params>;
-
-function matchPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<string>): CheminMatchResult<Params> {
+function matchPattern<Params>(pattern: Chemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? CheminUtils.splitPathname(pathname) : pathname;
   return matchPart(pattern, pathParts);
 }
