@@ -35,12 +35,12 @@ export interface Chemin<Params = any> {
   [IS_CHEMIN]: Params;
   parts: Array<Part>;
   serialize: {} extends Params
-    ? ((params?: null, options?: SlashOptions) => string)
+    ? (params?: null, options?: SlashOptions) => string
     : (params: Params, options?: SlashOptions) => string;
   match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
   matchExact: (pathname: string | Array<string>) => Params | false;
   extract: () => Array<Chemin>;
-  toString: () => string;
+  toString: (options?: SlashOptions) => string;
 }
 
 type In = string | CheminParam<any, any> | Chemin<any>;
@@ -85,13 +85,12 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       }
       return part;
     });
-    let name: string | null = null;
     let chemins: Array<Chemin> | null = null;
 
     const chemin: Chemin<any> = {
       [IS_CHEMIN]: true,
       parts,
-      serialize: (params: any | null, options?: SlashOptions) =>
+      serialize: (params: any | null = null, options: SlashOptions = {}) =>
         serializeChemin(chemin, params, {
           ...defaultSerializeOptions,
           ...options
@@ -99,7 +98,11 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       extract: () => (chemins === null ? (chemins = extractChemins(chemin)) : chemins),
       match: pathname => matchChemin(chemin, pathname),
       matchExact: pathname => matchExactChemin(chemin, pathname),
-      toString: () => (name === null ? (name = cheminToString(chemin)) : name)
+      toString: (options: SlashOptions = {}) =>
+        cheminToString(chemin, {
+          ...defaultSerializeOptions,
+          ...options
+        })
     };
 
     return chemin;
@@ -156,7 +159,7 @@ function matchExactChemin<Params>(
 
 function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | false {
   if (isChemin(part)) {
-    const match = matchNextParts(part.parts, pathname);
+    const match = matchParts(part.parts, pathname);
     if (match === false) {
       return false;
     }
@@ -177,17 +180,19 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
   };
 }
 
-function matchNextParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<any> | false {
+function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<any> | false {
   if (parts.length === 0) {
     return { params: {}, rest: pathname };
   }
   const nextPart = parts[0];
-  const nextHasParams = isChemin(nextPart) ? true : (nextPart as any).noValue !== true;
+  const nextHasParams = isChemin(nextPart)
+    ? true
+    : !('noValue' in nextPart) || nextPart.noValue !== true;
   const res = matchPart(nextPart, pathname);
   if (res === false) {
     return false;
   }
-  const nextRes = matchNextParts(parts.slice(1), res.rest);
+  const nextRes = matchParts(parts.slice(1), res.rest);
   if (nextRes === false) {
     return false;
   }
@@ -202,8 +207,8 @@ function matchNextParts(parts: Array<Part>, pathname: Array<string>): CheminMatc
 
 function serializeChemin<Params>(
   chemin: Chemin<Params>,
-  params?: {} extends Params ? null | undefined : Params,
-  options: SlashOptions = {}
+  params: {} extends Params ? null | undefined : Params,
+  options: SlashOptions
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const paramsResolved: any = params === null || params === undefined ? {} : params;
@@ -228,7 +233,7 @@ function serializeChemin<Params>(
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
-function cheminToString(chemin: Chemin<any>, options: SlashOptions = {}): string {
+function cheminToString(chemin: Chemin<any>, options: SlashOptions): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts
     .map((part): string => {

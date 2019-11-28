@@ -52,18 +52,37 @@ function number<N extends string>(name: N): CheminParam<N, number> {
   };
 }
 
-function integer<N extends string>(name: N): CheminParam<N, number> {
+export interface IntergerOptions {
+  strict?: boolean;
+}
+
+function integer<N extends string>(name: N, options: IntergerOptions = {}): CheminParam<N, number> {
+  const { strict = true } = options;
   return {
     name,
     match: (value, ...rest) => {
+      if (!value) {
+        return { match: false };
+      }
       const parsed = parseInt(value, 10);
       if (Number.isNaN(parsed)) {
         return { match: false };
       }
+      if (strict && parsed.toString() !== value) {
+        return { match: false };
+      }
       return { match: true, value: parsed, next: rest };
     },
-    serialize: value => value.toString(),
-    toString: () => `:${name}(number)`
+    serialize: value => {
+      if (typeof value !== 'number') {
+        throw new Error(`CheminParam.interger expect an interger when serializing`);
+      }
+      if (Math.round(value) !== value || !Number.isFinite(value)) {
+        throw new Error(`CheminParam.interger expect an interger when serializing`);
+      }
+      return value.toString();
+    },
+    toString: () => `:${name}(interger)`
   };
 }
 

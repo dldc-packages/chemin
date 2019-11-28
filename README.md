@@ -69,7 +69,7 @@ function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
       return { match: false, next: all };
     },
     serialize: value => value,
-    toString: () => `:${name}(id4)`,
+    toString: () => `:${name}(id4)`
   };
 }
 
@@ -143,7 +143,11 @@ The option object accepts two `boolean` properties:
 - `trailingSlash` (default: `false`): Add a slash at the end
 
 ```ts
-const chemin = Chemin.create('admin', CheminParam.number('userId'), CheminParam.optionalConst('edit'));
+const chemin = Chemin.create(
+  'admin',
+  CheminParam.number('userId'),
+  CheminParam.optionalConst('edit')
+);
 chemin.serialize({ userId: 42, edit: true }); // /admin/42/edit
 ```
 
@@ -213,13 +217,23 @@ const chemin = Chemin.create(CheminParam.number('myNum'));
 Chemin.matchExact(chemin, '/3.1415'); // { myNum: 3.1415 }
 ```
 
-#### CheminParam.integer(name)
+**NOTE**: Because it uses `parseFloat` this will also accept `Infinity`, `10e2`...
+
+#### CheminParam.integer(name, options?)
 
 > A integer using `parseInt(x, 10)`
 
 ```ts
 const chemin = Chemin.create(CheminParam.integer('myInt'));
 Chemin.matchExact(chemin, '/42'); // { myInt: 42 }
+```
+
+By default it will only match if the parsed number is the same as the raw value.
+You can pass an option object with `strict: false` to allow any valid `parseInt`:
+
+```ts
+const chemin = Chemin.create(CheminParam.integer('myInt', { strict: false }));
+Chemin.matchExact(chemin, '/42fooo'); // { myInt: 42 }
 ```
 
 #### CheminParam.string(name)
