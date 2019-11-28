@@ -24,8 +24,8 @@ const ROUTES = (() => {
     post,
     admin: {
       home: admin,
-      post: adminPost,
-    },
+      post: adminPost
+    }
   };
 })();
 
@@ -76,7 +76,7 @@ function run(pathname: string) {
   '/admin/post/42',
   '/yolo',
   '/post/egegegd',
-  '/admin/post/42/delete',
+  '/admin/post/42/delete'
 ].map(p => {
   console.log(`${p} ==> ${run(p)}`);
 });

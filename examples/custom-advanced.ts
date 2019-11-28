@@ -24,7 +24,7 @@ function customId<N extends string>(name: N): CheminParam<N, CustomId> {
     serialize: value => {
       return `${value.num}-${value.name}`;
     },
-    toString: () => `:${name}(customId)`,
+    toString: () => `:${name}(customId)`
   };
 }
 

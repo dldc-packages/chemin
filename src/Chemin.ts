@@ -7,7 +7,7 @@ export const Chemin = {
   createCreator,
   create: defaultCreateChemin,
   parse: parseChemin,
-  isChemin,
+  isChemin
 };
 
 type CreateChemin = typeof defaultCreateChemin;
@@ -94,12 +94,12 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       serialize: (params: any | null, options?: SlashOptions) =>
         serializeChemin(chemin, params, {
           ...defaultSerializeOptions,
-          ...options,
+          ...options
         }),
       extract: () => (chemins === null ? (chemins = extractChemins(chemin)) : chemins),
       match: pathname => matchChemin(chemin, pathname),
       matchExact: pathname => matchExactChemin(chemin, pathname),
-      toString: () => (name === null ? (name = cheminToString(chemin)) : name),
+      toString: () => (name === null ? (name = cheminToString(chemin)) : name)
     };
 
     return chemin;
@@ -120,7 +120,9 @@ function parseChemin<Params extends { [key: string]: string } = { [key: string]:
     if (isParam === false && isOptional) {
       return CheminParam.optionalConst(name);
     }
-    const inner: CheminParam<string, any> = isParam ? CheminParam.string(name) : CheminParam.constant(name);
+    const inner: CheminParam<string, any> = isParam
+      ? CheminParam.string(name)
+      : CheminParam.constant(name);
     return isOptional ? CheminParam.optional(inner) : inner;
   });
   return creator(...parts);
@@ -133,12 +135,18 @@ export interface CheminMatch<Params> {
 
 export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
 
-function matchChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
+function matchChemin<Params>(
+  chemin: Chemin<Params>,
+  pathname: string | Array<string>
+): CheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? CheminUtils.splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
-function matchExactChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): false | Params {
+function matchExactChemin<Params>(
+  chemin: Chemin<Params>,
+  pathname: string | Array<string>
+): false | Params {
   const match = matchChemin(chemin, pathname);
   if (match && match.rest.length === 0) {
     return match.params;
@@ -154,7 +162,7 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
     }
     return {
       rest: match.rest,
-      params: match.params,
+      params: match.params
     };
   }
   const res = part.match(...pathname);
@@ -163,9 +171,9 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
   }
   return {
     params: {
-      [part.name]: res.value,
+      [part.name]: res.value
     },
-    rest: res.next,
+    rest: res.next
   };
 }
 
@@ -187,8 +195,8 @@ function matchNextParts(parts: Array<Part>, pathname: Array<string>): CheminMatc
     rest: nextRes.rest,
     params: {
       ...(nextHasParams ? res.params : {}),
-      ...nextRes.params,
-    },
+      ...nextRes.params
+    }
   };
 }
 

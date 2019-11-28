@@ -1,5 +1,5 @@
 export const CheminUtils = {
-  splitPathname,
+  splitPathname
 };
 
 function splitPathname(pathname: string): Array<string> {

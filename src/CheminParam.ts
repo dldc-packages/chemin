@@ -6,10 +6,12 @@ export const CheminParam = {
   optional,
   optionalConst,
   optionalString,
-  multiple,
+  multiple
 };
 
-type PartMatchResult<T> = { match: false } | { match: true; value: T extends void ? null : T; next: Array<string> };
+type PartMatchResult<T> =
+  | { match: false }
+  | { match: true; value: T extends void ? null : T; next: Array<string> };
 type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
 type PartSerialize<T> = (value: T) => string | null;
 type PartToString = () => string;
@@ -31,7 +33,7 @@ function string<N extends string>(name: N): CheminParam<N, string> {
       return { match: false };
     },
     serialize: value => value.toString(),
-    toString: () => `:${name}`,
+    toString: () => `:${name}`
   };
 }
 
@@ -46,7 +48,7 @@ function number<N extends string>(name: N): CheminParam<N, number> {
       return { match: true, value: parsed, next: rest };
     },
     serialize: value => value.toString(),
-    toString: () => `:${name}(number)`,
+    toString: () => `:${name}(number)`
   };
 }
 
@@ -61,7 +63,7 @@ function integer<N extends string>(name: N): CheminParam<N, number> {
       return { match: true, value: parsed, next: rest };
     },
     serialize: value => value.toString(),
-    toString: () => `:${name}(number)`,
+    toString: () => `:${name}(number)`
   };
 }
 
@@ -76,28 +78,37 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
       return { match: false };
     },
     serialize: () => name,
-    toString: () => name,
+    toString: () => name
   };
 }
 
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
-function optional<N extends string, T extends any>(sub: CheminParam<N, T>): CheminParam<N, OptionalValue<T>> {
+function optional<N extends string, T extends any>(
+  sub: CheminParam<N, T>
+): CheminParam<N, OptionalValue<T>> {
   return {
     name: sub.name,
     match: (...all) => {
       const subMatch = sub.match(...all);
       if (subMatch.match) {
-        return { match: true, value: { present: true, value: subMatch.value }, next: subMatch.next };
+        return {
+          match: true,
+          value: { present: true, value: subMatch.value },
+          next: subMatch.next
+        };
       }
       return { match: true, value: { present: false }, next: all };
     },
     serialize: value => (value.present ? sub.serialize(value.value) : null),
-    toString: () => `${sub.toString()}?`,
+    toString: () => `${sub.toString()}?`
   };
 }
 
-function optionalConst<N extends string>(name: N, constant: string = name): CheminParam<N, boolean> {
+function optionalConst<N extends string>(
+  name: N,
+  constant: string = name
+): CheminParam<N, boolean> {
   return {
     name,
     match: (...all) => {
@@ -107,7 +118,7 @@ function optionalConst<N extends string>(name: N, constant: string = name): Chem
       return { match: true, value: false, next: all };
     },
     serialize: value => (value ? constant : null),
-    toString: () => `${constant}?`,
+    toString: () => `${constant}?`
   };
 }
 
@@ -121,7 +132,7 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
       return { match: true, value: false, next: all };
     },
     serialize: value => (value === false ? null : value),
-    toString: () => `:${name}?`,
+    toString: () => `:${name}?`
   };
 }
 
@@ -148,6 +159,6 @@ function multiple<N extends string, T extends any>(
       return { match: true, value: values, next };
     },
     serialize: value => value.map(v => sub.serialize(v)).join('/'),
-    toString: () => `${sub.toString()}${atLeastOne ? '+' : '*'}`,
+    toString: () => `${sub.toString()}${atLeastOne ? '+' : '*'}`
   };
 }
