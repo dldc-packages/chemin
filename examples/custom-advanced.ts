@@ -30,6 +30,6 @@ function customId<N extends string>(name: N): CheminParam<N, CustomId> {
 
 const path = Chemin.create('item', customId('itemId'));
 
-const match = Chemin.match(path, '/item/42-etienne');
+const match = path.match('/item/42-etienne');
 
 console.log(match);
