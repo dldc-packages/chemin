@@ -40,7 +40,7 @@ export interface Chemin<Params = any> {
   match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
   matchExact: (pathname: string | Array<string>) => Params | false;
   extract: () => Array<Chemin>;
-  toString: (options?: SlashOptions) => string;
+  stringify: (options?: SlashOptions) => string;
 }
 
 type In = string | CheminParam<any, any> | Chemin<any>;
@@ -98,8 +98,8 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       extract: () => (chemins === null ? (chemins = extractChemins(chemin)) : chemins),
       match: pathname => matchChemin(chemin, pathname),
       matchExact: pathname => matchExactChemin(chemin, pathname),
-      toString: (options: SlashOptions = {}) =>
-        cheminToString(chemin, {
+      stringify: (options: SlashOptions = {}) =>
+        cheminStringify(chemin, {
           ...defaultSerializeOptions,
           ...options
         })
@@ -233,14 +233,14 @@ function serializeChemin<Params>(
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
-function cheminToString(chemin: Chemin<any>, options: SlashOptions): string {
+function cheminStringify(chemin: Chemin<any>, options: SlashOptions): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts
     .map((part): string => {
       if (isChemin(part)) {
-        return cheminToString(part, { leadingSlash: false, trailingSlash: false });
+        return cheminStringify(part, { leadingSlash: false, trailingSlash: false });
       }
-      return part.toString();
+      return part.stringify();
     })
     .filter(val => {
       return val.length > 0;

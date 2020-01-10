@@ -12,7 +12,7 @@ function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
       return { match: false, next: all };
     },
     serialize: value => value,
-    toString: () => `:${name}(id4)`
+    stringify: () => `:${name}(id4)`
   };
 }
 

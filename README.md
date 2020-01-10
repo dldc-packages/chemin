@@ -47,7 +47,7 @@ import { Chemin, CheminParam as P } from 'chemin';
 const postFragment = Chemin.create('post', P.number('postId'));
 const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
 
-console.log(postAdmin.toString()); // /admin/:userId/post/:postId(number)/edit
+console.log(postAdmin.stringify()); // /admin/:userId/post/:postId(number)/edit
 ```
 
 ## Custom `CheminParam`
@@ -69,7 +69,7 @@ function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
       return { match: false, next: all };
     },
     serialize: value => value,
-    toString: () => `:${name}(id4)`
+    stringify: () => `:${name}(id4)`
   };
 }
 
@@ -181,7 +181,7 @@ const adminUser = Chemin.create(admin, 'user');
 adminUser.extract(); // [adminUser, admin];
 ```
 
-### chemin.toString()
+### chemin.stringify()
 
 Return a string representation of the chemin.
 
@@ -191,7 +191,7 @@ import { Chemin, CheminParam as P } from 'chemin';
 const postFragment = Chemin.create('post', P.number('postId'));
 const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
 
-console.log(postAdmin.toString()); // /admin/:userId/post/:postId(number)/edit
+console.log(postAdmin.stringify()); // /admin/:userId/post/:postId(number)/edit
 ```
 
 ### CheminUtils.splitPathname(pathname)
