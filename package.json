@@ -28,22 +28,25 @@
   "scripts": {
     "build": "tsdx build",
     "examples": "ts-node ./scripts/run-examples.ts",
-    "pub": "yarn build && CI=true np",
+    "pub": "yarn build && np",
     "start": "tsdx watch",
-    "test": "tsdx test",
-    "typecheck": "tsc --noEmit"
+    "test": "tsdx test --coverage",
+    "test:watch": "tsdx test --watch",
+    "typecheck": "tsc --noEmit",
+    "codecov": "codecov"
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/fs-extra": "^8.0.1",
+    "@types/fs-extra": "^8.1.0",
     "@types/inquirer": "^6.5.0",
-    "@types/jest": "^24.0.25",
+    "@types/jest": "^25.1.4",
+    "codecov": "^3.6.5",
     "fs-extra": "^8.1.0",
-    "inquirer": "^7.0.3",
-    "np": "^5.2.1",
-    "ts-node": "^8.6.0",
-    "tsdx": "^0.12.1",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "inquirer": "^7.1.0",
+    "np": "^6.2.0",
+    "ts-node": "^8.6.2",
+    "tsdx": "^0.12.3",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
   }
 }
