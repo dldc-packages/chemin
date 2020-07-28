@@ -113,7 +113,7 @@ function optional<N extends string, T extends any>(
       if (subMatch.match) {
         return {
           match: true,
-          value: { present: true, value: subMatch.value },
+          value: { present: true, value: subMatch.value as T },
           next: subMatch.next
         };
       }
@@ -169,7 +169,7 @@ function multiple<N extends string, T extends any>(
         nextMatch = sub.match(...next);
         if (nextMatch.match) {
           next = nextMatch.next;
-          values.push(nextMatch.value);
+          values.push(nextMatch.value as T);
         }
       } while (nextMatch.match === true);
       if (values.length === 0 && atLeastOne === true) {
