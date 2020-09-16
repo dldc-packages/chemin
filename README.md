@@ -162,7 +162,7 @@ Accepts a `pathname` and return `false` or `CheminMatchResult`.
   - `rest`: an array of string of the remaining parts of the pathname once the matching is done
   - `params`: an object of params extracted from the matching
 
-**Note**: If you want to pass an array to `pathname` make sure to use `CheminUtils.splitPathname`.
+**Note**: If you want to pass an array to `pathname` make sure to use `splitPathname`.
 
 ### chemin.matchExact(pathname)
 
@@ -194,14 +194,14 @@ const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit
 console.log(postAdmin.stringify()); // /admin/:userId/post/:postId(number)/edit
 ```
 
-### CheminUtils.splitPathname(pathname)
+### splitPathname(pathname)
 
 > Split a pathname and prevent empty parts
 
 Accepts a string and returns an array od strings.
 
 ```ts
-CheminUtils.splitPathname('/admin/user/5'); // ['admin', 'user', '5']
+splitPathname('/admin/user/5'); // ['admin', 'user', '5']
 ```
 
 ### CheminParam
