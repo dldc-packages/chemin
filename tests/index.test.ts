@@ -1,4 +1,4 @@
-import { Chemin, CheminParam as P, CheminMatchMaybe, CheminUtils } from '../src';
+import { Chemin, CheminParam as P, CheminMatchMaybe, splitPathname } from '../src';
 
 test('Serialize chemin', () => {
   const chemin = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
@@ -176,12 +176,12 @@ test('extract twice should return the same array', () => {
 
 test('match usung splitPathname', () => {
   const chemin = Chemin.create('foo', 'bar', P.optionalConst('baz'));
-  const parts = CheminUtils.splitPathname('/foo/bar');
+  const parts = splitPathname('/foo/bar');
   expect(chemin.match(parts)).toEqual({ params: { baz: false }, rest: [] });
 });
 
 test('splitPathname without trainlingSlash', () => {
-  const parts = CheminUtils.splitPathname('foo/bar');
+  const parts = splitPathname('foo/bar');
   expect(parts).toEqual(['foo', 'bar']);
 });
 

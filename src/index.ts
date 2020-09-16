@@ -1,3 +1,1 @@
-export { Chemin, CheminMatchMaybe, CheminMatch } from './Chemin';
-export { CheminParam } from './CheminParam';
-export { CheminUtils } from './CheminUtils';
+export { Chemin, CheminMatchMaybe, CheminMatch, CheminParam, splitPathname } from './common/mod';
