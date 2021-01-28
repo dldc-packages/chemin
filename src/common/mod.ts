@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 export function splitPathname(pathname: string): Array<string> {
   const strParts = pathname.split('/');
   if (strParts[0] === '') {
