@@ -218,7 +218,7 @@ type Params<T> = T extends string
   ? { [K in N]: P }
   : {};
 
-const IS_CHEMIN = Symbol('IS_CHEMIN');
+const IS_CHEMIN = Symbol.for('IS_CHEMIN_INTERNAL');
 
 interface SlashOptions {
   leadingSlash?: boolean;
