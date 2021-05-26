@@ -1,4 +1,4 @@
-import { Chemin, CheminParam as P, CheminMatchMaybe, splitPathname } from '../src';
+import { Chemin, CheminParam as P, CheminMatchMaybe, splitPathname, cheminsEqual } from '../src';
 
 test('Serialize chemin', () => {
   const chemin = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
@@ -365,4 +365,48 @@ describe('build in CheminParams', () => {
     expect(chemin.serialize({ categories: ['hey'] })).toEqual('/hey');
     expect(chemin.stringify()).toEqual('/:categories+');
   });
+});
+
+test('cheminEqual', () => {
+  expect(cheminsEqual(Chemin.create(), Chemin.create())).toBe(true);
+  expect(cheminsEqual(Chemin.create('foo'), Chemin.create('foo'))).toBe(true);
+  const chemin = Chemin.create(P.integer('num'));
+  expect(cheminsEqual(chemin, chemin)).toBe(true);
+  expect(cheminsEqual(Chemin.create(P.integer('num')), Chemin.create(P.integer('num')))).toBe(true);
+  const ch1 = Chemin.create('api');
+  const ch2 = Chemin.create(ch1, 'foo');
+  const ch3 = Chemin.create(ch1, 'foo');
+  expect(cheminsEqual(ch2, ch3)).toBe(true);
+  // compare twice to get cached flattened
+  expect(cheminsEqual(ch2, ch3)).toBe(true);
+  expect(ch2.equal(ch3)).toBe(true);
+  expect(
+    cheminsEqual(
+      Chemin.create(
+        P.integer('int'),
+        P.string('str'),
+        P.number('num'),
+        P.optional(P.constant('yolo')),
+        P.optionalConst('hey'),
+        P.optionalString('youpi'),
+        P.multiple(P.constant('a'))
+      ),
+      Chemin.create(
+        P.integer('int'),
+        P.string('str'),
+        P.number('num'),
+        P.optional(P.constant('yolo')),
+        P.optionalConst('hey'),
+        P.optionalString('youpi'),
+        P.multiple(P.constant('a'))
+      )
+    )
+  ).toBe(true);
+});
+
+test('cheminEqual => false', () => {
+  expect(cheminsEqual(Chemin.create('foo'), Chemin.create('bar'))).toBe(false);
+  expect(cheminsEqual(Chemin.create('foo', 'hey'), Chemin.create('bar'))).toBe(false);
+  expect(cheminsEqual(Chemin.create(P.number('num')), Chemin.create(P.integer('num')))).toBe(false);
+  expect(cheminsEqual(Chemin.create(P.number('num')), Chemin.create(P.number('num2')))).toBe(false);
 });

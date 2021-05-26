@@ -1,1 +1,10 @@
-export { Chemin, CheminMatchMaybe, CheminMatch, CheminParam, splitPathname } from './common/mod';
+export {
+  Chemin,
+  CheminMatchMaybe,
+  CheminMatch,
+  CheminParam,
+  splitPathname,
+  cheminsEqual,
+  CheminParamAny,
+  CheminParamBase
+} from './common/mod';

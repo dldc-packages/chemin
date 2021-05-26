@@ -26,18 +26,30 @@ type PartMatchResult<T> =
   | { match: true; value: T extends void ? null : T; next: Array<string> };
 type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
 type PartSerialize<T> = (value: T) => string | null;
+type PartIsEqual<N extends string, T, Meta> = (other: CheminParam<N, T, Meta>) => boolean;
 type PartStringify = () => string;
 
-export type CheminParam<N extends string, T> = {
+export type CheminParamBase<N extends string, T, Meta> = {
   name: N;
   match: PartMatch<T>;
   stringify: PartStringify;
   serialize: PartSerialize<T>;
-} & (T extends void ? { noValue: true } : {});
+  meta: Meta;
+  isEqual: PartIsEqual<string, any, Meta>;
+  factory: (...args: Array<any>) => CheminParam<N, T, Meta>;
+};
+
+export type CheminParam<N extends string, T, Meta = null> = CheminParamBase<N, T, Meta> &
+  (T extends void ? { noValue: true } : {});
+
+export type CheminParamAny = CheminParam<any, any, any>;
 
 function string<N extends string>(name: N): CheminParam<N, string> {
   return {
+    factory: string,
     name,
+    meta: null,
+    isEqual: other => other.name === name,
     match: (value, ...rest) => {
       if (typeof value === 'string' && value.length > 0) {
         return { match: true, value: value, next: rest };
@@ -52,6 +64,9 @@ function string<N extends string>(name: N): CheminParam<N, string> {
 function number<N extends string>(name: N): CheminParam<N, number> {
   return {
     name,
+    factory: number,
+    meta: null,
+    isEqual: other => other.name === name,
     match: (value, ...rest) => {
       const parsed = parseFloat(value);
       if (Number.isNaN(parsed)) {
@@ -69,10 +84,13 @@ function integer<N extends string>(
   options: {
     strict?: boolean;
   } = {}
-): CheminParam<N, number> {
+): CheminParam<N, number, { strict: boolean }> {
   const { strict = true } = options;
   return {
     name,
+    meta: { strict },
+    isEqual: other => strict === other.meta.strict,
+    factory: integer,
     match: (value, ...rest) => {
       if (!value) {
         return { match: false };
@@ -103,6 +121,9 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
   return {
     name,
     noValue: true,
+    meta: null,
+    factory: constant,
+    isEqual: other => other.name === name,
     match: (value, ...rest) => {
       if (name === value) {
         return { match: true, next: rest, value: null };
@@ -117,10 +138,13 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
 function optional<N extends string, T extends any>(
-  sub: CheminParam<N, T>
-): CheminParam<N, OptionalValue<T>> {
+  sub: CheminParam<N, T, any>
+): CheminParam<N, OptionalValue<T>, { sub: CheminParam<N, T, any> }> {
   return {
     name: sub.name,
+    meta: { sub },
+    factory: optional,
+    isEqual: other => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
     match: (...all) => {
       const subMatch = sub.match(...all);
       if (subMatch.match) {
@@ -140,9 +164,12 @@ function optional<N extends string, T extends any>(
 function optionalConst<N extends string>(
   name: N,
   constant: string = name
-): CheminParam<N, boolean> {
+): CheminParam<N, boolean, { constant: string }> {
   return {
     name,
+    factory: optionalConst,
+    meta: { constant },
+    isEqual: other => other.meta.constant === constant && other.name === name,
     match: (...all) => {
       if (all[0] === constant) {
         return { match: true, value: true, next: all.slice(1) };
@@ -157,6 +184,9 @@ function optionalConst<N extends string>(
 function optionalString<N extends string>(name: N): CheminParam<N, string | false> {
   return {
     name,
+    meta: null,
+    factory: optionalString,
+    isEqual: other => other.name === name,
     match: (...all) => {
       if (typeof all[0] === 'string' && all[0].length > 0) {
         return { match: true, value: all[0], next: all.slice(1) };
@@ -168,12 +198,18 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
   };
 }
 
-function multiple<N extends string, T extends any>(
-  sub: CheminParam<N, T>,
+function multiple<N extends string, T extends any, Meta extends any>(
+  sub: CheminParam<N, T, Meta>,
   atLeastOne: boolean = false
-): CheminParam<N, Array<T>> {
+): CheminParam<N, Array<T>, { sub: CheminParam<N, T, Meta>; atLeastOne: boolean }> {
   return {
     name: sub.name,
+    meta: { atLeastOne, sub },
+    factory: multiple,
+    isEqual: other =>
+      sub.name === other.name &&
+      cheminParamsEqual(other.meta.sub, sub) &&
+      atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
       let next = all;
@@ -206,15 +242,15 @@ export const Chemin = {
 
 type CreateChemin = typeof defaultCreateChemin;
 
-type Part = CheminParam<any, any> | Chemin<any>;
+type Part = CheminParamAny | Chemin<any>;
 
 type Params<T> = T extends string
   ? {}
   : T extends Chemin<infer P>
   ? P
-  : T extends CheminParam<any, void>
+  : T extends CheminParam<any, void, any>
   ? {}
-  : T extends CheminParam<infer N, infer P>
+  : T extends CheminParam<infer N, infer P, any>
   ? { [K in N]: P }
   : {};
 
@@ -234,10 +270,12 @@ export interface Chemin<Params = any> {
   match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
   matchExact: (pathname: string | Array<string>) => Params | false;
   extract: () => Array<Chemin>;
+  flatten: () => Array<CheminParamAny>;
+  equal: (other: Chemin) => boolean;
   stringify: (options?: SlashOptions) => string;
 }
 
-type In = string | CheminParam<any, any> | Chemin<any>;
+type In = string | CheminParamAny | Chemin<any>;
 
 function isChemin(maybe: any): maybe is Chemin<any> {
   return maybe && maybe[IS_CHEMIN];
@@ -279,7 +317,8 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       }
       return part;
     });
-    let chemins: Array<Chemin> | null = null;
+    let extracted: Array<Chemin> | null = null;
+    let flattened: Array<CheminParamAny> | null = null;
 
     const chemin: Chemin<any> = {
       [IS_CHEMIN]: true,
@@ -289,9 +328,11 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
           ...defaultSerializeOptions,
           ...options
         }),
-      extract: () => (chemins === null ? (chemins = extractChemins(chemin)) : chemins),
+      extract: () => (extracted === null ? (extracted = extractChemins(chemin)) : extracted),
       match: pathname => matchChemin(chemin, pathname),
       matchExact: pathname => matchExactChemin(chemin, pathname),
+      flatten: () => (flattened === null ? (flattened = flattenChemins(chemin)) : flattened),
+      equal: other => cheminsEqual(chemin, other),
       stringify: (options: SlashOptions = {}) =>
         cheminStringify(chemin, {
           ...defaultSerializeOptions,
@@ -443,6 +484,19 @@ function cheminStringify(chemin: Chemin<any>, options: SlashOptions): string {
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
+function flattenChemins(chemin: Chemin): Array<CheminParamAny> {
+  const result: Array<CheminParamAny> = [];
+  function traverse(current: Part) {
+    if (isChemin(current)) {
+      result.push(...current.flatten());
+    } else {
+      result.push(current);
+    }
+  }
+  chemin.parts.forEach(traverse);
+  return result;
+}
+
 function extractChemins(chemin: Chemin): Array<Chemin> {
   const result: Array<Chemin> = [chemin];
   function traverse(current: Part) {
@@ -455,4 +509,29 @@ function extractChemins(chemin: Chemin): Array<Chemin> {
   }
   chemin.parts.forEach(traverse);
   return result;
+}
+
+function cheminParamsEqual(
+  left: CheminParamBase<any, any, any>,
+  right: CheminParamBase<any, any, any>
+): boolean {
+  if (left.factory !== right.factory) {
+    return false;
+  }
+  return left.isEqual(right);
+}
+
+export function cheminsEqual(left: Chemin, right: Chemin): boolean {
+  if (left === right) {
+    return true;
+  }
+  const leftFlat = left.flatten();
+  const rightFlat = right.flatten();
+  if (leftFlat.length !== rightFlat.length) {
+    return false;
+  }
+  return leftFlat.every((param, index) => {
+    const other = rightFlat[index];
+    return cheminParamsEqual(param, other);
+  });
 }
