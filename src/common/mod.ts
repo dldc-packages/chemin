@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-redeclare */
 export function splitPathname(pathname: string): Array<string> {
   const strParts = pathname.split('/');
@@ -273,10 +274,12 @@ export interface Chemin<Params = any> {
 
 type In = string | CheminParamAny | Chemin<any>;
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function isChemin(maybe: any): maybe is Chemin<any> {
   return maybe && maybe[IS_CHEMIN];
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function createCreator(defaultSerializeOptions: SlashOptions = {}) {
   /**
  const r = num=>Array(num).fill(null).map((v,i)=>i);
