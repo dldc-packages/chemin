@@ -24,8 +24,8 @@ describe('Make sure different chemins return the correct match', () => {
         ['/foo', { params: {}, rest: ['foo'] }],
         ['/foo/', { params: {}, rest: ['foo'] }],
         ['/foo/bar', { params: {}, rest: ['foo', 'bar'] }],
-        ['/foo/bar/', { params: {}, rest: ['foo', 'bar'] }]
-      ]
+        ['/foo/bar/', { params: {}, rest: ['foo', 'bar'] }],
+      ],
     },
     {
       chemin: Chemin.parse('/admin'),
@@ -37,8 +37,8 @@ describe('Make sure different chemins return the correct match', () => {
         ['/admin/home', { params: {}, rest: ['home'] }],
         ['/admin/home/', { params: {}, rest: ['home'] }],
         ['/adminnnn/', false],
-        ['/admi', false]
-      ]
+        ['/admi', false],
+      ],
     },
     {
       chemin: Chemin.create('admin', P.optional(P.string('tool'))),
@@ -52,16 +52,16 @@ describe('Make sure different chemins return the correct match', () => {
           '/admin/blabla/then',
           {
             params: { tool: { present: true, value: 'blabla' } },
-            rest: ['then']
-          }
-        ]
-      ]
-    }
+            rest: ['then'],
+          },
+        ],
+      ],
+    },
   ];
 
-  data.forEach(data => {
+  data.forEach((data) => {
     describe(`Test ${data.chemin}`, () => {
-      data.tests.forEach(v => {
+      data.tests.forEach((v) => {
         test(`'${v[0]}'`, () => {
           expect(data.chemin.match(v[0])).toEqual(v[1]);
         });
@@ -111,9 +111,7 @@ test('serialize', () => {
   expect(empty.serialize()).toBe('/');
   expect(post.serialize()).toBe('/post');
   expect(postFragment.serialize({ postId: 42 })).toBe('/post/42');
-  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe(
-    '/admin/etienne/post/42/edit'
-  );
+  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe('/admin/etienne/post/42/edit');
 });
 
 test('serialize options', () => {
@@ -121,12 +119,9 @@ test('serialize options', () => {
   const post = Chemin.create(empty, P.constant('post'));
   const postFragment = Chemin.create(post, P.number('postId'));
   const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
-  expect(
-    postAdmin.serialize(
-      { postId: 42, userId: 'etienne' },
-      { leadingSlash: false, trailingSlash: true }
-    )
-  ).toBe('admin/etienne/post/42/edit/');
+  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' }, { leadingSlash: false, trailingSlash: true })).toBe(
+    'admin/etienne/post/42/edit/'
+  );
   expect(empty.serialize(null, { leadingSlash: false, trailingSlash: true })).toBe('/');
   expect(empty.serialize(null, { leadingSlash: true, trailingSlash: true })).toBe('/');
   expect(empty.serialize(null, { leadingSlash: false, trailingSlash: false })).toBe('');
@@ -146,7 +141,7 @@ test('stringify', () => {
 test('createCreator', () => {
   const create = Chemin.createCreator({
     leadingSlash: false,
-    trailingSlash: true
+    trailingSlash: true,
   });
   const empty = create();
   const post = create(empty, P.constant('post'));
@@ -155,9 +150,7 @@ test('createCreator', () => {
   expect(empty.serialize()).toBe('/');
   expect(post.serialize()).toBe('post/');
   expect(postFragment.serialize({ postId: 42 })).toBe('post/42/');
-  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe(
-    'admin/etienne/post/42/edit/'
-  );
+  expect(postAdmin.serialize({ postId: 42, userId: 'etienne' })).toBe('admin/etienne/post/42/edit/');
 });
 
 test('parse with a custom creator', () => {
@@ -282,15 +275,15 @@ describe('build in CheminParams', () => {
     expect(chemin.match('/foo')).toEqual({ params: { num: { present: false } }, rest: ['foo'] });
     expect(chemin.match('/foo/bar')).toEqual({
       params: { num: { present: false } },
-      rest: ['foo', 'bar']
+      rest: ['foo', 'bar'],
     });
     expect(chemin.match('/45')).toEqual({
       params: { num: { present: true, value: 45 } },
-      rest: []
+      rest: [],
     });
     expect(chemin.match('/45/foo')).toEqual({
       params: { num: { present: true, value: 45 } },
-      rest: ['foo']
+      rest: ['foo'],
     });
     expect(chemin.match('')).toEqual({ params: { num: { present: false } }, rest: [] });
     expect(chemin.serialize({ num: { present: true, value: 54 } })).toEqual('/54');
@@ -306,7 +299,7 @@ describe('build in CheminParams', () => {
     expect(chemin.match('/some-string/bar')).toEqual({ params: { str: true }, rest: ['bar'] });
     expect(chemin.match('/foo/some-string')).toEqual({
       params: { str: false },
-      rest: ['foo', 'some-string']
+      rest: ['foo', 'some-string'],
     });
     expect(chemin.serialize({ str: true })).toEqual('/some-string');
     expect(chemin.serialize({ str: false })).toEqual('/');
@@ -331,15 +324,15 @@ describe('build in CheminParams', () => {
     expect(chemin.match('')).toEqual({ params: { categories: [] }, rest: [] });
     expect(chemin.match('/some/foo/bar')).toEqual({
       params: { categories: ['some', 'foo', 'bar'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.match('/cat1/cat2')).toEqual({
       params: { categories: ['cat1', 'cat2'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.match('/single')).toEqual({
       params: { categories: ['single'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.serialize({ categories: ['hey'] })).toEqual('/hey');
     expect(chemin.serialize({ categories: [] })).toEqual('/');
@@ -352,15 +345,15 @@ describe('build in CheminParams', () => {
     expect(chemin.match('')).toEqual(false);
     expect(chemin.match('/some/foo/bar')).toEqual({
       params: { categories: ['some', 'foo', 'bar'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.match('/cat1/cat2')).toEqual({
       params: { categories: ['cat1', 'cat2'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.match('/single')).toEqual({
       params: { categories: ['single'] },
-      rest: []
+      rest: [],
     });
     expect(chemin.serialize({ categories: ['hey'] })).toEqual('/hey');
     expect(chemin.stringify()).toEqual('/:categories+');

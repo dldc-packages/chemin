@@ -6,5 +6,5 @@ export {
   splitPathname,
   cheminsEqual,
   CheminParamAny,
-  CheminParamBase
-} from './common/mod';
+  CheminParamBase,
+} from './common/mod.js';

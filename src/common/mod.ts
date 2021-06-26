@@ -18,12 +18,10 @@ export const CheminParam = {
   optional,
   optionalConst,
   optionalString,
-  multiple
+  multiple,
 };
 
-type PartMatchResult<T> =
-  | { match: false }
-  | { match: true; value: T extends void ? null : T; next: Array<string> };
+type PartMatchResult<T> = { match: false } | { match: true; value: T extends void ? null : T; next: Array<string> };
 type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
 type PartSerialize<T> = (value: T) => string | null;
 type PartIsEqual<N extends string, T, Meta> = (other: CheminParam<N, T, Meta>) => boolean;
@@ -49,15 +47,15 @@ function string<N extends string>(name: N): CheminParam<N, string> {
     factory: string,
     name,
     meta: null,
-    isEqual: other => other.name === name,
+    isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
       if (typeof value === 'string' && value.length > 0) {
         return { match: true, value: value, next: rest };
       }
       return { match: false };
     },
-    serialize: value => value.toString(),
-    stringify: () => `:${name}`
+    serialize: (value) => value.toString(),
+    stringify: () => `:${name}`,
   };
 }
 
@@ -66,7 +64,7 @@ function number<N extends string>(name: N): CheminParam<N, number> {
     name,
     factory: number,
     meta: null,
-    isEqual: other => other.name === name,
+    isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
       const parsed = parseFloat(value);
       if (Number.isNaN(parsed)) {
@@ -74,8 +72,8 @@ function number<N extends string>(name: N): CheminParam<N, number> {
       }
       return { match: true, value: parsed, next: rest };
     },
-    serialize: value => value.toString(),
-    stringify: () => `:${name}(number)`
+    serialize: (value) => value.toString(),
+    stringify: () => `:${name}(number)`,
   };
 }
 
@@ -89,7 +87,7 @@ function integer<N extends string>(
   return {
     name,
     meta: { strict },
-    isEqual: other => strict === other.meta.strict,
+    isEqual: (other) => strict === other.meta.strict,
     factory: integer,
     match: (value, ...rest) => {
       if (!value) {
@@ -104,7 +102,7 @@ function integer<N extends string>(
       }
       return { match: true, value: parsed, next: rest };
     },
-    serialize: value => {
+    serialize: (value) => {
       if (typeof value !== 'number') {
         throw new Error(`CheminParam.interger expect an interger when serializing`);
       }
@@ -113,7 +111,7 @@ function integer<N extends string>(
       }
       return value.toString();
     },
-    stringify: () => `:${name}(interger)`
+    stringify: () => `:${name}(interger)`,
   };
 }
 
@@ -123,7 +121,7 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
     noValue: true,
     meta: null,
     factory: constant,
-    isEqual: other => other.name === name,
+    isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
       if (name === value) {
         return { match: true, next: rest, value: null };
@@ -131,7 +129,7 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
       return { match: false };
     },
     serialize: () => name,
-    stringify: () => name
+    stringify: () => name,
   };
 }
 
@@ -144,20 +142,20 @@ function optional<N extends string, T extends any>(
     name: sub.name,
     meta: { sub },
     factory: optional,
-    isEqual: other => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
+    isEqual: (other) => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
     match: (...all) => {
       const subMatch = sub.match(...all);
       if (subMatch.match) {
         return {
           match: true,
           value: { present: true, value: subMatch.value as T },
-          next: subMatch.next
+          next: subMatch.next,
         };
       }
       return { match: true, value: { present: false }, next: all };
     },
-    serialize: value => (value.present ? sub.serialize(value.value) : null),
-    stringify: () => `${sub.stringify()}?`
+    serialize: (value) => (value.present ? sub.serialize(value.value) : null),
+    stringify: () => `${sub.stringify()}?`,
   };
 }
 
@@ -169,15 +167,15 @@ function optionalConst<N extends string>(
     name,
     factory: optionalConst,
     meta: { constant },
-    isEqual: other => other.meta.constant === constant && other.name === name,
+    isEqual: (other) => other.meta.constant === constant && other.name === name,
     match: (...all) => {
       if (all[0] === constant) {
         return { match: true, value: true, next: all.slice(1) };
       }
       return { match: true, value: false, next: all };
     },
-    serialize: value => (value ? constant : null),
-    stringify: () => `${constant}?`
+    serialize: (value) => (value ? constant : null),
+    stringify: () => `${constant}?`,
   };
 }
 
@@ -186,15 +184,15 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
     name,
     meta: null,
     factory: optionalString,
-    isEqual: other => other.name === name,
+    isEqual: (other) => other.name === name,
     match: (...all) => {
       if (typeof all[0] === 'string' && all[0].length > 0) {
         return { match: true, value: all[0], next: all.slice(1) };
       }
       return { match: true, value: false, next: all };
     },
-    serialize: value => (value === false ? null : value),
-    stringify: () => `:${name}?`
+    serialize: (value) => (value === false ? null : value),
+    stringify: () => `:${name}?`,
   };
 }
 
@@ -206,10 +204,8 @@ function multiple<N extends string, T extends any, Meta extends any>(
     name: sub.name,
     meta: { atLeastOne, sub },
     factory: multiple,
-    isEqual: other =>
-      sub.name === other.name &&
-      cheminParamsEqual(other.meta.sub, sub) &&
-      atLeastOne === other.meta.atLeastOne,
+    isEqual: (other) =>
+      sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) && atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
       let next = all;
@@ -226,8 +222,8 @@ function multiple<N extends string, T extends any, Meta extends any>(
       }
       return { match: true, value: values, next };
     },
-    serialize: value => value.map(v => sub.serialize(v)).join('/'),
-    stringify: () => `${sub.stringify()}${atLeastOne ? '+' : '*'}`
+    serialize: (value) => value.map((v) => sub.serialize(v)).join('/'),
+    stringify: () => `${sub.stringify()}${atLeastOne ? '+' : '*'}`,
   };
 }
 
@@ -237,7 +233,7 @@ export const Chemin = {
   createCreator,
   create: defaultCreateChemin,
   parse: parseChemin,
-  isChemin
+  isChemin,
 };
 
 type CreateChemin = typeof defaultCreateChemin;
@@ -311,7 +307,7 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
 
   function createChemin(...fragments: Array<In>): Chemin<any>;
   function createChemin(...fragments: Array<In>): Chemin<any> {
-    const parts = fragments.map(part => {
+    const parts = fragments.map((part) => {
       if (typeof part === 'string') {
         return CheminParam.constant(part);
       }
@@ -326,18 +322,18 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       serialize: (params: any | null = null, options: SlashOptions = {}) =>
         serializeChemin(chemin, params, {
           ...defaultSerializeOptions,
-          ...options
+          ...options,
         }),
       extract: () => (extracted === null ? (extracted = extractChemins(chemin)) : extracted),
-      match: pathname => matchChemin(chemin, pathname),
-      matchExact: pathname => matchExactChemin(chemin, pathname),
+      match: (pathname) => matchChemin(chemin, pathname),
+      matchExact: (pathname) => matchExactChemin(chemin, pathname),
       flatten: () => (flattened === null ? (flattened = flattenChemins(chemin)) : flattened),
-      equal: other => cheminsEqual(chemin, other),
+      equal: (other) => cheminsEqual(chemin, other),
       stringify: (options: SlashOptions = {}) =>
         cheminStringify(chemin, {
           ...defaultSerializeOptions,
-          ...options
-        })
+          ...options,
+        }),
     };
 
     return chemin;
@@ -351,16 +347,14 @@ function parseChemin<Params extends { [key: string]: string } = { [key: string]:
   creator: CreateChemin = defaultCreateChemin
 ): Chemin<Params> {
   const strParts = splitPathname(str);
-  const parts: Array<Part> = strParts.map(strPart => {
+  const parts: Array<Part> = strParts.map((strPart) => {
     const isParam = strPart[0] === ':';
     const isOptional = strPart[strPart.length - 1] === '?';
     const name = strPart.slice(isParam ? 1 : 0, isOptional ? -1 : undefined);
     if (isParam === false && isOptional) {
       return CheminParam.optionalConst(name);
     }
-    const inner: CheminParam<string, any> = isParam
-      ? CheminParam.string(name)
-      : CheminParam.constant(name);
+    const inner: CheminParam<string, any> = isParam ? CheminParam.string(name) : CheminParam.constant(name);
     return isOptional ? CheminParam.optional(inner) : inner;
   });
   return creator(...parts);
@@ -373,18 +367,12 @@ export interface CheminMatch<Params> {
 
 export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
 
-function matchChemin<Params>(
-  chemin: Chemin<Params>,
-  pathname: string | Array<string>
-): CheminMatchMaybe<Params> {
+function matchChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
-function matchExactChemin<Params>(
-  chemin: Chemin<Params>,
-  pathname: string | Array<string>
-): false | Params {
+function matchExactChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): false | Params {
   const match = matchChemin(chemin, pathname);
   if (match && match.rest.length === 0) {
     return match.params;
@@ -400,7 +388,7 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
     }
     return {
       rest: match.rest,
-      params: match.params
+      params: match.params,
     };
   }
   const res = part.match(...pathname);
@@ -409,9 +397,9 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
   }
   return {
     params: {
-      [part.name]: res.value
+      [part.name]: res.value,
     },
-    rest: res.next
+    rest: res.next,
   };
 }
 
@@ -420,9 +408,7 @@ function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<an
     return { params: {}, rest: pathname };
   }
   const nextPart = parts[0];
-  const nextHasParams = isChemin(nextPart)
-    ? true
-    : !('noValue' in nextPart) || nextPart.noValue !== true;
+  const nextHasParams = isChemin(nextPart) ? true : !('noValue' in nextPart) || nextPart.noValue !== true;
   const res = matchPart(nextPart, pathname);
   if (res === false) {
     return false;
@@ -435,8 +421,8 @@ function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<an
     rest: nextRes.rest,
     params: {
       ...(nextHasParams ? res.params : {}),
-      ...nextRes.params
-    }
+      ...nextRes.params,
+    },
   };
 }
 
@@ -449,7 +435,7 @@ function serializeChemin<Params>(
   const paramsResolved: any = params === null || params === undefined ? {} : params;
 
   const result = chemin.parts
-    .map(part => {
+    .map((part) => {
       if (isChemin(part)) {
         return serializeChemin(part, paramsResolved, { leadingSlash: false, trailingSlash: false });
       }
@@ -477,7 +463,7 @@ function cheminStringify(chemin: Chemin<any>, options: SlashOptions): string {
       }
       return part.stringify();
     })
-    .filter(val => {
+    .filter((val) => {
       return val.length > 0;
     })
     .join('/');
@@ -511,10 +497,7 @@ function extractChemins(chemin: Chemin): Array<Chemin> {
   return result;
 }
 
-function cheminParamsEqual(
-  left: CheminParamBase<any, any, any>,
-  right: CheminParamBase<any, any, any>
-): boolean {
+function cheminParamsEqual(left: CheminParamBase<any, any, any>, right: CheminParamBase<any, any, any>): boolean {
   if (left.factory !== right.factory) {
     return false;
   }
