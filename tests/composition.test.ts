@@ -1,4 +1,4 @@
-import { Chemin, CheminParam as P } from '../src';
+import { Chemin, CheminParam as P } from '../src/mod';
 
 test('composition', () => {
   const postFragment = Chemin.create('post', P.number('postId'));

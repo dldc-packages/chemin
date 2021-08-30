@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "ES2020",
-    "lib": ["dom", "esnext"],
+    "lib": ["esnext"],
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
@@ -18,8 +18,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "jsx": "react"
+    "esModuleInterop": true
   },
   "include": ["src", "tests"]
 }

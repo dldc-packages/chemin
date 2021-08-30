@@ -1,4 +1,4 @@
-import { Chemin, CheminParam } from '../src';
+import { Chemin, CheminParam } from '../src/mod';
 
 test('number', () => {
   const chemin = Chemin.create(CheminParam.number('myNum'));

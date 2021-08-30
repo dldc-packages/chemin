@@ -1,4 +1,4 @@
-import { Chemin, CheminParam } from '../src';
+import { Chemin, CheminParam } from '../src/mod';
 
 test('custom advanced', () => {
   interface CustomId {

@@ -1,4 +1,4 @@
-import { Chemin, CheminParam as P } from '../src';
+import { Chemin, CheminParam as P } from '../src/mod';
 
 test('advanced', () => {
   function matchExact<Params>(chemin: Chemin<Params>, pathname: string): Params | false {
@@ -49,7 +49,9 @@ test('advanced', () => {
   function run(pathname: string) {
     const adminPostMatch = matchExact(ROUTES.admin.post, pathname);
     if (adminPostMatch) {
-      return `Admin > Post (id: ${adminPostMatch.postId})${adminPostMatch.delete ? ' > Delete' : ''}`;
+      return `Admin > Post (id: ${adminPostMatch.postId})${
+        adminPostMatch.delete ? ' > Delete' : ''
+      }`;
     }
     const routes = matchAll(ROUTES, pathname);
     if (routes.home) {

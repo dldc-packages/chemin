@@ -19,41 +19,48 @@
   },
   "license": "MIT",
   "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
-  "type": "module",
-  "exports": "./dist/index.js",
-  "module": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/chemin.es.js",
+      "require": "./dist/chemin.cjs.js"
+    }
+  },
+  "main": "./dist/chemin.cjs.js",
+  "module": "./dist/chemin.es.js",
+  "types": "./dist/mod.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc -p ./tsconfig.build.json",
+    "build": "rimraf dist && vite build && yarn build:types && denoify",
+    "build:types": "tsc -p ./tsconfig.build.json",
     "codecov": "codecov",
     "lint": "prettier . --check && eslint . && tsc --noEmit",
     "lint:fix": "prettier . --write . && eslint . --fix",
     "release": "yarn build && np",
     "test": "yarn lint && jest --coverage",
     "test:run": "jest",
-    "test:watch": "jest --watch"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.28.0",
-    "@typescript-eslint/parser": "^4.28.0",
-    "codecov": "^3.8.1",
-    "eslint": "^7.29.0",
+    "@types/jest": "^27.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
+    "codecov": "^3.8.3",
+    "denoify": "^0.9.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "jest": "^27.0.5",
+    "jest": "^27.0.6",
     "jest-ts-tsx-resolver": "^1.0.0",
     "np": "^7.5.0",
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "ts-jest": "^27.0.4",
+    "tslib": "^2.3.1",
+    "typescript": "^4.3.5",
+    "vite": "^2.4.4"
   },
   "publishConfig": {
     "access": "public",

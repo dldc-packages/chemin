@@ -1,4 +1,4 @@
-import { Chemin, CheminParam } from '../src';
+import { Chemin, CheminParam } from '../src/mod';
 
 test('custom matcher', () => {
   // match only string of 4 char [a-z0-9]

@@ -1,4 +1,4 @@
-import { Chemin, CheminParam } from '../src';
+import { Chemin, CheminParam } from '../src/mod';
 
 test('multiple allow zero', () => {
   const chemin = Chemin.create(CheminParam.multiple(CheminParam.string('categories')));
