@@ -125,7 +125,7 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
 
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
-function optional<N extends string, T extends any>(
+function optional<N extends string, T>(
   sub: CheminParam<N, T, any>
 ): CheminParam<N, OptionalValue<T>, { sub: CheminParam<N, T, any> }> {
   return {
@@ -186,7 +186,7 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
   };
 }
 
-function multiple<N extends string, T extends any, Meta extends any>(
+function multiple<N extends string, T, Meta>(
   sub: CheminParam<N, T, Meta>,
   atLeastOne: boolean = false
 ): CheminParam<N, Array<T>, { sub: CheminParam<N, T, Meta>; atLeastOne: boolean }> {
