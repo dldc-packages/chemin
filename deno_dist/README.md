@@ -2,7 +2,7 @@
   <img src="https://github.com/etienne-dldc/chemin/blob/master/design/logo.png" width="900" alt="chemin logo">
 </p>
 
-# 🥾 Chemin [![Build Status](https://travis-ci.org/etienne-dldc/chemin.svg?branch=master)](https://travis-ci.org/etienne-dldc/chemin) [![](https://badgen.net/bundlephobia/minzip/chemin)](https://bundlephobia.com/result?p=chemin) [![codecov](https://codecov.io/gh/etienne-dldc/chemin/branch/master/graph/badge.svg)](https://codecov.io/gh/etienne-dldc/chemin)
+# 🥾 Chemin [![Build Status](https://travis-ci.org/etienne-dldc/chemin.svg?branch=master)](https://travis-ci.org/etienne-dldc/chemin) [![](https://badgen.net/bundlephobia/minzip/chemin)](https://bundlephobia.com/result?p=chemin)
 
 > A type-safe pattern builder & route matching library written in TypeScript
 
