@@ -3,6 +3,5 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  resolver: 'jest-ts-tsx-resolver',
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
 };
