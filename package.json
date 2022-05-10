@@ -1,6 +1,6 @@
 {
   "name": "chemin",
-  "version": "8.0.1",
+  "version": "8.0.2",
   "description": "A type-safe pattern builder & route matching library written in TypeScript",
   "keywords": [
     "path",
