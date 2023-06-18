@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { Chemin, CheminParam } from '../src/mod';
 
 test('multiple allow zero', () => {

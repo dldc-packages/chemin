@@ -9,9 +9,7 @@ export const CheminParam = {
   multiple,
 };
 
-type PartMatchResult<T> =
-  | { match: false }
-  | { match: true; value: T extends void ? null : T; next: Array<string> };
+type PartMatchResult<T> = { match: false } | { match: true; value: T extends void ? null : T; next: Array<string> };
 type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
 type PartSerialize<T> = (value: T) => string | null;
 type PartIsEqual<N extends string, T, Meta> = (other: CheminParam<N, T, Meta>) => boolean;
@@ -195,9 +193,7 @@ function multiple<N extends string, T, Meta>(
     meta: { atLeastOne, sub },
     factory: multiple,
     isEqual: (other) =>
-      sub.name === other.name &&
-      cheminParamsEqual(other.meta.sub, sub) &&
-      atLeastOne === other.meta.atLeastOne,
+      sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) && atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
       let next = all;

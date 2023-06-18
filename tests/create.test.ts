@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { Chemin, CheminParam as P } from '../src/mod';
 
 test('create', () => {

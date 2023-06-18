@@ -143,11 +143,7 @@ The option object accepts two `boolean` properties:
 - `trailingSlash` (default: `false`): Add a slash at the end
 
 ```ts
-const chemin = Chemin.create(
-  'admin',
-  CheminParam.number('userId'),
-  CheminParam.optionalConst('edit')
-);
+const chemin = Chemin.create('admin', CheminParam.number('userId'), CheminParam.optionalConst('edit'));
 chemin.serialize({ userId: 42, edit: true }); // /admin/42/edit
 ```
 

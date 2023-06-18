@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { Chemin, CheminParam as P } from '../src/mod';
 
 test('advanced', () => {
@@ -36,7 +37,7 @@ test('advanced', () => {
         [K in keyof T]: MatchAllResult<T[K]>;
       };
 
-  function matchAll<T>(obj: T, pathname: string): MatchAllResult<T> {
+  function matchAll<T extends Record<string, any>>(obj: T, pathname: string): MatchAllResult<T> {
     if (Chemin.isChemin(obj)) {
       return matchExact(obj, pathname) as any;
     }
@@ -49,9 +50,7 @@ test('advanced', () => {
   function run(pathname: string) {
     const adminPostMatch = matchExact(ROUTES.admin.post, pathname);
     if (adminPostMatch) {
-      return `Admin > Post (id: ${adminPostMatch.postId})${
-        adminPostMatch.delete ? ' > Delete' : ''
-      }`;
+      return `Admin > Post (id: ${adminPostMatch.postId})${adminPostMatch.delete ? ' > Delete' : ''}`;
     }
     const routes = matchAll(ROUTES, pathname);
     if (routes.home) {

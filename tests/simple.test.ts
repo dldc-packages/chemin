@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { Chemin } from '../src/mod';
 
 test('simple', () => {

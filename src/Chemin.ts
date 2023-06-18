@@ -130,9 +130,7 @@ function parseChemin<Params extends { [key: string]: string } = { [key: string]:
     if (isParam === false && isOptional) {
       return CheminParam.optionalConst(name);
     }
-    const inner: CheminParam<string, any> = isParam
-      ? CheminParam.string(name)
-      : CheminParam.constant(name);
+    const inner: CheminParam<string, any> = isParam ? CheminParam.string(name) : CheminParam.constant(name);
     return isOptional ? CheminParam.optional(inner) : inner;
   });
   return creator(...parts);
@@ -145,18 +143,12 @@ export interface CheminMatch<Params> {
 
 export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
 
-function matchChemin<Params>(
-  chemin: Chemin<Params>,
-  pathname: string | Array<string>
-): CheminMatchMaybe<Params> {
+function matchChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
-function matchExactChemin<Params>(
-  chemin: Chemin<Params>,
-  pathname: string | Array<string>
-): false | Params {
+function matchExactChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): false | Params {
   const match = matchChemin(chemin, pathname);
   if (match && match.rest.length === 0) {
     return match.params;
@@ -192,9 +184,7 @@ function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<an
     return { params: {}, rest: pathname };
   }
   const nextPart = parts[0];
-  const nextHasParams = isChemin(nextPart)
-    ? true
-    : !('noValue' in nextPart) || nextPart.noValue !== true;
+  const nextHasParams = isChemin(nextPart) ? true : !('noValue' in nextPart) || nextPart.noValue !== true;
   const res = matchPart(nextPart, pathname);
   if (res === false) {
     return false;

@@ -1,15 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["src", "tests"],
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "module": "ES2020",
-    "lib": ["esnext"],
+    "lib": ["ESNext"],
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
+    "noEmit": true,
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
@@ -18,7 +20,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
-    "esModuleInterop": true
-  },
-  "include": ["src", "tests"]
+    "esModuleInterop": true,
+    "skipLibCheck": true // required because esbuild would need 'DOM' lib
+  }
 }
