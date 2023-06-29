@@ -1,5 +1,5 @@
 {
-  "name": "chemin",
+  "name": "@dldc/chemin",
   "version": "8.0.2",
   "description": "A type-safe pattern builder & route matching library written in TypeScript",
   "keywords": [
@@ -9,13 +9,13 @@
     "ts",
     "typescript"
   ],
-  "homepage": "https://github.com/etienne-dldc/chemin#readme",
+  "homepage": "https://github.com/dldc-packages/chemin#readme",
   "bugs": {
-    "url": "https://github.com/etienne-dldc/chemin/issues"
+    "url": "https://github.com/dldc-packages/chemin/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/etienne-dldc/chemin.git"
+    "url": "git+https://github.com/dldc-packages/chemin.git"
   },
   "license": "MIT",
   "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
