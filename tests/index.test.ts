@@ -121,7 +121,7 @@ test('serialize options', () => {
   const postFragment = Chemin.create(post, P.number('postId'));
   const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
   expect(postAdmin.serialize({ postId: 42, userId: 'etienne' }, { leadingSlash: false, trailingSlash: true })).toBe(
-    'admin/etienne/post/42/edit/'
+    'admin/etienne/post/42/edit/',
   );
   expect(empty.serialize(null, { leadingSlash: false, trailingSlash: true })).toBe('/');
   expect(empty.serialize(null, { leadingSlash: true, trailingSlash: true })).toBe('/');
@@ -383,7 +383,7 @@ test('cheminEqual', () => {
         P.optional(P.constant('yolo')),
         P.optionalConst('hey'),
         P.optionalString('youpi'),
-        P.multiple(P.constant('a'))
+        P.multiple(P.constant('a')),
       ),
       Chemin.create(
         P.integer('int'),
@@ -392,9 +392,9 @@ test('cheminEqual', () => {
         P.optional(P.constant('yolo')),
         P.optionalConst('hey'),
         P.optionalString('youpi'),
-        P.multiple(P.constant('a'))
-      )
-    )
+        P.multiple(P.constant('a')),
+      ),
+    ),
   ).toBe(true);
 });
 

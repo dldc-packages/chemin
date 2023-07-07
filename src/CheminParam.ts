@@ -69,7 +69,7 @@ function integer<N extends string>(
   name: N,
   options: {
     strict?: boolean;
-  } = {}
+  } = {},
 ): CheminParam<N, number, { strict: boolean }> {
   const { strict = true } = options;
   return {
@@ -124,7 +124,7 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
 function optional<N extends string, T>(
-  sub: CheminParam<N, T, any>
+  sub: CheminParam<N, T, any>,
 ): CheminParam<N, OptionalValue<T>, { sub: CheminParam<N, T, any> }> {
   return {
     name: sub.name,
@@ -149,7 +149,7 @@ function optional<N extends string, T>(
 
 function optionalConst<N extends string>(
   name: N,
-  constant: string = name
+  constant: string = name,
 ): CheminParam<N, boolean, { constant: string }> {
   return {
     name,
@@ -186,7 +186,7 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
 
 function multiple<N extends string, T, Meta>(
   sub: CheminParam<N, T, Meta>,
-  atLeastOne: boolean = false
+  atLeastOne: boolean = false,
 ): CheminParam<N, Array<T>, { sub: CheminParam<N, T, Meta>; atLeastOne: boolean }> {
   return {
     name: sub.name,
@@ -217,7 +217,7 @@ function multiple<N extends string, T, Meta>(
 
 export function cheminParamsEqual(
   left: CheminParamBase<any, any, any>,
-  right: CheminParamBase<any, any, any>
+  right: CheminParamBase<any, any, any>,
 ): boolean {
   if (left.factory !== right.factory) {
     return false;

@@ -120,7 +120,7 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
 
 function parseChemin<Params extends { [key: string]: string } = { [key: string]: string }>(
   str: string,
-  creator: CreateChemin = defaultCreateChemin
+  creator: CreateChemin = defaultCreateChemin,
 ): Chemin<Params> {
   const strParts = splitPathname(str);
   const parts: Array<Part> = strParts.map((strPart) => {
@@ -205,7 +205,7 @@ function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<an
 function serializeChemin<Params>(
   chemin: Chemin<Params>,
   params: {} extends Params ? null | undefined : Params,
-  options: SlashOptions
+  options: SlashOptions,
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const paramsResolved: any = params === null || params === undefined ? {} : params;
