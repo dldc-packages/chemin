@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest';
-import { Chemin, CheminParam as P } from '../src/mod';
+import { Chemin, IChemin, CheminParam as P } from '../src/mod';
 
 test('advanced', () => {
-  function matchExact<Params>(chemin: Chemin<Params>, pathname: string): Params | false {
+  function matchExact<Params>(chemin: IChemin<Params>, pathname: string): Params | false {
     const match = chemin.match(pathname);
     if (match !== false && match.rest.length === 0) {
       return match.params;
@@ -31,7 +31,7 @@ test('advanced', () => {
     };
   })();
 
-  type MatchAllResult<T> = T extends Chemin<infer P>
+  type MatchAllResult<T> = T extends IChemin<infer P>
     ? P | false
     : {
         [K in keyof T]: MatchAllResult<T[K]>;

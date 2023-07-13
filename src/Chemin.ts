@@ -12,11 +12,11 @@ export const Chemin = {
 
 type CreateChemin = typeof defaultCreateChemin;
 
-type Part = CheminParamAny | Chemin<any>;
+type Part = CheminParamAny | IChemin<any>;
 
 type Params<T> = T extends string
   ? {}
-  : T extends Chemin<infer P>
+  : T extends IChemin<infer P>
   ? P
   : T extends CheminParam<any, void, any>
   ? {}
@@ -31,7 +31,7 @@ interface SlashOptions {
   trailingSlash?: boolean;
 }
 
-export interface Chemin<Params = any> {
+export interface IChemin<Params = any> {
   [IS_CHEMIN]: Params;
   parts: Array<Part>;
   serialize: {} extends Params
@@ -39,60 +39,59 @@ export interface Chemin<Params = any> {
     : (params: Params, options?: SlashOptions) => string;
   match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
   matchExact: (pathname: string | Array<string>) => Params | false;
-  extract: () => Array<Chemin>;
+  extract: () => Array<IChemin>;
   flatten: () => Array<CheminParamAny>;
-  equal: (other: Chemin) => boolean;
+  equal: (other: IChemin) => boolean;
   stringify: (options?: SlashOptions) => string;
 }
 
-type In = string | CheminParamAny | Chemin<any>;
+type In = string | CheminParamAny | IChemin<any>;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-function isChemin(maybe: any): maybe is Chemin<any> {
+function isChemin(maybe: any): maybe is IChemin<any> {
   return maybe && maybe[IS_CHEMIN];
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function createCreator(defaultSerializeOptions: SlashOptions = {}) {
   /**
- const r = num=>Array(num).fill(null).map((v,i)=>i);
- const res = r(10).map(count=> count === 0 ? (`function createChemin(): Chemin<{}>;`) : (`function createChemin<${r(count).map(i=>`P${i} extends In`).join(', ')}>(${r(count).map(i=>`p${i}: P${i}`).join(', ')}): Chemin<${r(count).map(i=>`Params<P${i}>`).join(' & ')}>;`)).map(v=>`// prettier-ignore\n${v}`).join('\n');
+   *  const r = num=>Array(num).fill(null).map((v,i)=>i);
+   *  const res = r(10).map(count=> count === 0 ? (`function createChemin(): IChemin<{}>;`) : (`function createChemin<${r(count).map(i=>`P${i} extends In`).join(', ')}>(${r(count).map(i=>`p${i}: P${i}`).join(', ')}): IChemin<${r(count).map(i=>`Params<P${i}>`).join(' & ')}>;`)).map(v=>`// prettier-ignore\n${v}`).join('\n');
+   */
 
- */
+  // prettier-ignore
+  function createChemin(): IChemin<{}>;
+  // prettier-ignore
+  function createChemin<P0 extends In>(p0: P0): IChemin<Params<P0>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In>(p0: P0, p1: P1): IChemin<Params<P0> & Params<P1>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In>(p0: P0, p1: P1, p2: P2): IChemin<Params<P0> & Params<P1> & Params<P2>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In>(p0: P0, p1: P1, p2: P2, p3: P3): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7>>;
+  // prettier-ignore
+  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In, P8 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8): IChemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7> & Params<P8>>;
 
-  // prettier-ignore
-  function createChemin(): Chemin<{}>;
-  // prettier-ignore
-  function createChemin<P0 extends In>(p0: P0): Chemin<Params<P0>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In>(p0: P0, p1: P1): Chemin<Params<P0> & Params<P1>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In>(p0: P0, p1: P1, p2: P2): Chemin<Params<P0> & Params<P1> & Params<P2>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In>(p0: P0, p1: P1, p2: P2, p3: P3): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7>>;
-  // prettier-ignore
-  function createChemin<P0 extends In, P1 extends In, P2 extends In, P3 extends In, P4 extends In, P5 extends In, P6 extends In, P7 extends In, P8 extends In>(p0: P0, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8): Chemin<Params<P0> & Params<P1> & Params<P2> & Params<P3> & Params<P4> & Params<P5> & Params<P6> & Params<P7> & Params<P8>>;
-
-  function createChemin(...fragments: Array<In>): Chemin<any>;
-  function createChemin(...fragments: Array<In>): Chemin<any> {
+  function createChemin(...fragments: Array<In>): IChemin<any>;
+  function createChemin(...fragments: Array<In>): IChemin<any> {
     const parts = fragments.map((part) => {
       if (typeof part === 'string') {
         return CheminParam.constant(part);
       }
       return part;
     });
-    let extracted: Array<Chemin> | null = null;
+    let extracted: Array<IChemin> | null = null;
     let flattened: Array<CheminParamAny> | null = null;
 
-    const chemin: Chemin<any> = {
+    const chemin: IChemin<any> = {
       [IS_CHEMIN]: true,
       parts,
       serialize: (params: any | null = null, options: SlashOptions = {}) =>
@@ -121,7 +120,7 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
 function parseChemin<Params extends { [key: string]: string } = { [key: string]: string }>(
   str: string,
   creator: CreateChemin = defaultCreateChemin,
-): Chemin<Params> {
+): IChemin<Params> {
   const strParts = splitPathname(str);
   const parts: Array<Part> = strParts.map((strPart) => {
     const isParam = strPart[0] === ':';
@@ -136,19 +135,19 @@ function parseChemin<Params extends { [key: string]: string } = { [key: string]:
   return creator(...parts);
 }
 
-export interface CheminMatch<Params> {
+export interface ICheminMatch<Params> {
   params: Params;
   rest: Array<string>;
 }
 
-export type CheminMatchMaybe<Params> = CheminMatch<Params> | false;
+export type CheminMatchMaybe<Params> = ICheminMatch<Params> | false;
 
-function matchChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
+function matchChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
-function matchExactChemin<Params>(chemin: Chemin<Params>, pathname: string | Array<string>): false | Params {
+function matchExactChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): false | Params {
   const match = matchChemin(chemin, pathname);
   if (match && match.rest.length === 0) {
     return match.params;
@@ -156,7 +155,7 @@ function matchExactChemin<Params>(chemin: Chemin<Params>, pathname: string | Arr
   return false;
 }
 
-function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | false {
+function matchPart(part: Part, pathname: Array<string>): ICheminMatch<any> | false {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
     if (match === false) {
@@ -179,7 +178,7 @@ function matchPart(part: Part, pathname: Array<string>): CheminMatch<any> | fals
   };
 }
 
-function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<any> | false {
+function matchParts(parts: Array<Part>, pathname: Array<string>): ICheminMatch<any> | false {
   if (parts.length === 0) {
     return { params: {}, rest: pathname };
   }
@@ -203,7 +202,7 @@ function matchParts(parts: Array<Part>, pathname: Array<string>): CheminMatch<an
 }
 
 function serializeChemin<Params>(
-  chemin: Chemin<Params>,
+  chemin: IChemin<Params>,
   params: {} extends Params ? null | undefined : Params,
   options: SlashOptions,
 ): string {
@@ -230,7 +229,7 @@ function serializeChemin<Params>(
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
-function cheminStringify(chemin: Chemin<any>, options: SlashOptions): string {
+function cheminStringify(chemin: IChemin<any>, options: SlashOptions): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts
     .map((part): string => {
@@ -246,7 +245,7 @@ function cheminStringify(chemin: Chemin<any>, options: SlashOptions): string {
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
-function flattenChemins(chemin: Chemin): Array<CheminParamAny> {
+function flattenChemins(chemin: IChemin): Array<CheminParamAny> {
   const result: Array<CheminParamAny> = [];
   function traverse(current: Part) {
     if (isChemin(current)) {
@@ -259,8 +258,8 @@ function flattenChemins(chemin: Chemin): Array<CheminParamAny> {
   return result;
 }
 
-function extractChemins(chemin: Chemin): Array<Chemin> {
-  const result: Array<Chemin> = [chemin];
+function extractChemins(chemin: IChemin): Array<IChemin> {
+  const result: Array<IChemin> = [chemin];
   function traverse(current: Part) {
     if (isChemin(current)) {
       if (result.indexOf(current) === -1) {
@@ -273,7 +272,7 @@ function extractChemins(chemin: Chemin): Array<Chemin> {
   return result;
 }
 
-export function cheminsEqual(left: Chemin, right: Chemin): boolean {
+export function cheminsEqual(left: IChemin, right: IChemin): boolean {
   if (left === right) {
     return true;
   }

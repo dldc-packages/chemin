@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Chemin, CheminMatchMaybe, CheminParam as P, cheminsEqual, splitPathname } from '../src/mod';
+import { Chemin, CheminMatchMaybe, IChemin, CheminParam as P, cheminsEqual, splitPathname } from '../src/mod';
 
 test('Serialize chemin', () => {
   const chemin = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
@@ -13,7 +13,7 @@ test('Parse then stringify', () => {
 
 describe('Make sure different chemins return the correct match', () => {
   const data: Array<{
-    chemin: Chemin;
+    chemin: IChemin;
     tests: Array<[string, CheminMatchMaybe<any>]>;
   }> = [
     {
