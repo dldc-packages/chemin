@@ -15,7 +15,7 @@ type PartSerialize<T> = (value: T) => string | null;
 type PartIsEqual<N extends string, T, Meta> = (other: CheminParam<N, T, Meta>) => boolean;
 type PartStringify = () => string;
 
-export type CheminParamBase<N extends string, T, Meta> = {
+export interface ICheminParamBase<N extends string, T, Meta> {
   name: N;
   match: PartMatch<T>;
   stringify: PartStringify;
@@ -23,9 +23,9 @@ export type CheminParamBase<N extends string, T, Meta> = {
   meta: Meta;
   isEqual: PartIsEqual<string, any, Meta>;
   factory: (...args: Array<any>) => CheminParam<N, T, Meta>;
-};
+}
 
-export type CheminParam<N extends string, T, Meta = null> = CheminParamBase<N, T, Meta> &
+export type CheminParam<N extends string, T, Meta = null> = ICheminParamBase<N, T, Meta> &
   (T extends void ? { noValue: true } : {});
 
 export type CheminParamAny = CheminParam<any, any, any>;
@@ -216,8 +216,8 @@ function multiple<N extends string, T, Meta>(
 }
 
 export function cheminParamsEqual(
-  left: CheminParamBase<any, any, any>,
-  right: CheminParamBase<any, any, any>,
+  left: ICheminParamBase<any, any, any>,
+  right: ICheminParamBase<any, any, any>,
 ): boolean {
   if (left.factory !== right.factory) {
     return false;
