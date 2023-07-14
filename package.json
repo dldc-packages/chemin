@@ -38,7 +38,7 @@
     "changelog": "auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
     "lint": "prettier . --check && eslint . && tsc --noEmit",
     "lint:fix": "prettier . --write . && eslint . --fix",
-    "release": "release-it",
+    "release": "release-it --only-version",
     "test": "pnpm run lint && vitest run --coverage",
     "test:run": "vitest run",
     "test:watch": "vitest --watch",
