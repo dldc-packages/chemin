@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import type { CheminParam } from '../src/mod';
+import type { TCheminParam } from '../src/mod';
 import { Chemin } from '../src/mod';
 
 test('custom advanced', () => {
@@ -9,7 +9,7 @@ test('custom advanced', () => {
   }
 
   // match id 45-paul
-  function customId<N extends string>(name: N): CheminParam<N, CustomId> {
+  function customId<N extends string>(name: N): TCheminParam<N, CustomId> {
     return {
       factory: customId,
       name,

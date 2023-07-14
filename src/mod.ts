@@ -1,5 +1,14 @@
-export { Chemin, cheminsEqual } from './Chemin';
-export type { CheminMatchMaybe, IChemin, ICheminMatch } from './Chemin';
-export { CheminParam, cheminParamsEqual } from './CheminParam';
-export type { CheminParamAny, ICheminParamBase } from './CheminParam';
+export { Chemin, cheminsEqual, type IChemin, type ICheminMatch, type TCheminMatchMaybe } from './Chemin';
+export {
+  CheminParam,
+  cheminParamsEqual,
+  type ICheminParamBase,
+  type TCheminParam,
+  type TCheminParamAny,
+  type TPartIsEqual,
+  type TPartMatch,
+  type TPartMatchResult,
+  type TPartSerialize,
+  type TPartStringify,
+} from './CheminParam';
 export { splitPathname } from './utils';

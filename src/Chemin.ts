@@ -1,5 +1,4 @@
-import type { CheminParamAny } from './CheminParam';
-import { CheminParam, cheminParamsEqual } from './CheminParam';
+import { CheminParam, cheminParamsEqual, type TCheminParam, type TCheminParamAny } from './CheminParam';
 import { splitPathname } from './utils';
 
 const defaultCreateChemin = createCreator();
@@ -13,15 +12,15 @@ export const Chemin = {
 
 type CreateChemin = typeof defaultCreateChemin;
 
-type Part = CheminParamAny | IChemin<any>;
+type Part = TCheminParamAny | IChemin<any>;
 
 type Params<T> = T extends string
   ? {}
   : T extends IChemin<infer P>
   ? P
-  : T extends CheminParam<any, void, any>
+  : T extends TCheminParam<any, void, any>
   ? {}
-  : T extends CheminParam<infer N, infer P, any>
+  : T extends TCheminParam<infer N, infer P, any>
   ? { [K in N]: P }
   : {};
 
@@ -38,15 +37,15 @@ export interface IChemin<Params = any> {
   serialize: {} extends Params
     ? (params?: null, options?: SlashOptions) => string
     : (params: Params, options?: SlashOptions) => string;
-  match: (pathname: string | Array<string>) => CheminMatchMaybe<Params>;
+  match: (pathname: string | Array<string>) => TCheminMatchMaybe<Params>;
   matchExact: (pathname: string | Array<string>) => Params | false;
   extract: () => Array<IChemin>;
-  flatten: () => Array<CheminParamAny>;
+  flatten: () => Array<TCheminParamAny>;
   equal: (other: IChemin) => boolean;
   stringify: (options?: SlashOptions) => string;
 }
 
-type In = string | CheminParamAny | IChemin<any>;
+type In = string | TCheminParamAny | IChemin<any>;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function isChemin(maybe: any): maybe is IChemin<any> {
@@ -90,7 +89,7 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
       return part;
     });
     let extracted: Array<IChemin> | null = null;
-    let flattened: Array<CheminParamAny> | null = null;
+    let flattened: Array<TCheminParamAny> | null = null;
 
     const chemin: IChemin<any> = {
       [IS_CHEMIN]: true,
@@ -130,7 +129,7 @@ function parseChemin<Params extends { [key: string]: string } = { [key: string]:
     if (isParam === false && isOptional) {
       return CheminParam.optionalConst(name);
     }
-    const inner: CheminParam<string, any> = isParam ? CheminParam.string(name) : CheminParam.constant(name);
+    const inner: TCheminParam<string, any> = isParam ? CheminParam.string(name) : CheminParam.constant(name);
     return isOptional ? CheminParam.optional(inner) : inner;
   });
   return creator(...parts);
@@ -141,9 +140,9 @@ export interface ICheminMatch<Params> {
   rest: Array<string>;
 }
 
-export type CheminMatchMaybe<Params> = ICheminMatch<Params> | false;
+export type TCheminMatchMaybe<Params> = ICheminMatch<Params> | false;
 
-function matchChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): CheminMatchMaybe<Params> {
+function matchChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): TCheminMatchMaybe<Params> {
   const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
@@ -246,8 +245,8 @@ function cheminStringify(chemin: IChemin<any>, options: SlashOptions): string {
   return (leadingSlash ? '/' : '') + result + (trailingSlash ? '/' : '');
 }
 
-function flattenChemins(chemin: IChemin): Array<CheminParamAny> {
-  const result: Array<CheminParamAny> = [];
+function flattenChemins(chemin: IChemin): Array<TCheminParamAny> {
+  const result: Array<TCheminParamAny> = [];
   function traverse(current: Part) {
     if (isChemin(current)) {
       result.push(...current.flatten());

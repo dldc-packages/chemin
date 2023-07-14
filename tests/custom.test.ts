@@ -1,10 +1,10 @@
 import { expect, test } from 'vitest';
-import type { CheminParam } from '../src/mod';
+import type { TCheminParam } from '../src/mod';
 import { Chemin } from '../src/mod';
 
 test('custom matcher', () => {
   // match only string of 4 char [a-z0-9]
-  function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
+  function fourCharStringId<N extends string>(name: N): TCheminParam<N, string> {
     const reg = /^[a-z0-9]{4}$/;
     return {
       factory: fourCharStringId,

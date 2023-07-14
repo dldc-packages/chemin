@@ -9,28 +9,30 @@ export const CheminParam = {
   multiple,
 };
 
-type PartMatchResult<T> = { match: false } | { match: true; value: T extends void ? null : T; next: Array<string> };
-type PartMatch<T> = (...parts: Array<string>) => PartMatchResult<T>;
-type PartSerialize<T> = (value: T) => string | null;
-type PartIsEqual<N extends string, T, Meta> = (other: CheminParam<N, T, Meta>) => boolean;
-type PartStringify = () => string;
+export type TPartMatchResult<T> =
+  | { match: false }
+  | { match: true; value: T extends void ? null : T; next: Array<string> };
+export type TPartMatch<T> = (...parts: Array<string>) => TPartMatchResult<T>;
+export type TPartSerialize<T> = (value: T) => string | null;
+export type TPartIsEqual<N extends string, T, Meta> = (other: TCheminParam<N, T, Meta>) => boolean;
+export type TPartStringify = () => string;
 
 export interface ICheminParamBase<N extends string, T, Meta> {
   name: N;
-  match: PartMatch<T>;
-  stringify: PartStringify;
-  serialize: PartSerialize<T>;
+  match: TPartMatch<T>;
+  stringify: TPartStringify;
+  serialize: TPartSerialize<T>;
   meta: Meta;
-  isEqual: PartIsEqual<string, any, Meta>;
-  factory: (...args: Array<any>) => CheminParam<N, T, Meta>;
+  isEqual: TPartIsEqual<string, any, Meta>;
+  factory: (...args: Array<any>) => TCheminParam<N, T, Meta>;
 }
 
-export type CheminParam<N extends string, T, Meta = null> = ICheminParamBase<N, T, Meta> &
+export type TCheminParam<N extends string, T, Meta = null> = ICheminParamBase<N, T, Meta> &
   (T extends void ? { noValue: true } : {});
 
-export type CheminParamAny = CheminParam<any, any, any>;
+export type TCheminParamAny = TCheminParam<any, any, any>;
 
-function string<N extends string>(name: N): CheminParam<N, string> {
+function string<N extends string>(name: N): TCheminParam<N, string> {
   return {
     factory: string,
     name,
@@ -47,7 +49,7 @@ function string<N extends string>(name: N): CheminParam<N, string> {
   };
 }
 
-function number<N extends string>(name: N): CheminParam<N, number> {
+function number<N extends string>(name: N): TCheminParam<N, number> {
   return {
     name,
     factory: number,
@@ -70,7 +72,7 @@ function integer<N extends string>(
   options: {
     strict?: boolean;
   } = {},
-): CheminParam<N, number, { strict: boolean }> {
+): TCheminParam<N, number, { strict: boolean }> {
   const { strict = true } = options;
   return {
     name,
@@ -103,7 +105,7 @@ function integer<N extends string>(
   };
 }
 
-function constant<N extends string>(name: N): CheminParam<N, void> {
+function constant<N extends string>(name: N): TCheminParam<N, void> {
   return {
     name,
     noValue: true,
@@ -124,8 +126,8 @@ function constant<N extends string>(name: N): CheminParam<N, void> {
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
 function optional<N extends string, T>(
-  sub: CheminParam<N, T, any>,
-): CheminParam<N, OptionalValue<T>, { sub: CheminParam<N, T, any> }> {
+  sub: TCheminParam<N, T, any>,
+): TCheminParam<N, OptionalValue<T>, { sub: TCheminParam<N, T, any> }> {
   return {
     name: sub.name,
     meta: { sub },
@@ -150,7 +152,7 @@ function optional<N extends string, T>(
 function optionalConst<N extends string>(
   name: N,
   constant: string = name,
-): CheminParam<N, boolean, { constant: string }> {
+): TCheminParam<N, boolean, { constant: string }> {
   return {
     name,
     factory: optionalConst,
@@ -167,7 +169,7 @@ function optionalConst<N extends string>(
   };
 }
 
-function optionalString<N extends string>(name: N): CheminParam<N, string | false> {
+function optionalString<N extends string>(name: N): TCheminParam<N, string | false> {
   return {
     name,
     meta: null,
@@ -185,9 +187,9 @@ function optionalString<N extends string>(name: N): CheminParam<N, string | fals
 }
 
 function multiple<N extends string, T, Meta>(
-  sub: CheminParam<N, T, Meta>,
+  sub: TCheminParam<N, T, Meta>,
   atLeastOne: boolean = false,
-): CheminParam<N, Array<T>, { sub: CheminParam<N, T, Meta>; atLeastOne: boolean }> {
+): TCheminParam<N, Array<T>, { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }> {
   return {
     name: sub.name,
     meta: { atLeastOne, sub },
@@ -197,7 +199,7 @@ function multiple<N extends string, T, Meta>(
     match: (...all) => {
       const values: Array<T> = [];
       let next = all;
-      let nextMatch: PartMatchResult<T>;
+      let nextMatch: TPartMatchResult<T>;
       do {
         nextMatch = sub.match(...next);
         if (nextMatch.match) {
