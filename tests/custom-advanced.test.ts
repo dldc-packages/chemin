@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { Chemin, CheminParam } from '../src/mod';
+import type { CheminParam } from '../src/mod';
+import { Chemin } from '../src/mod';
 
 test('custom advanced', () => {
   interface CustomId {

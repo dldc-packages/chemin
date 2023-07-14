@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { Chemin, CheminMatchMaybe, IChemin, CheminParam as P, cheminsEqual, splitPathname } from '../src/mod';
+import type { CheminMatchMaybe, IChemin } from '../src/mod';
+import { Chemin, CheminParam as P, cheminsEqual, splitPathname } from '../src/mod';
 
 test('Serialize chemin', () => {
   const chemin = Chemin.create('admin', P.string('user'), P.multiple(P.number('nums')));
@@ -61,7 +62,7 @@ describe('Make sure different chemins return the correct match', () => {
   ];
 
   data.forEach((data) => {
-    describe(`Test ${data.chemin}`, () => {
+    describe(`Test ${data.chemin.stringify()}`, () => {
       data.tests.forEach((v) => {
         test(`'${v[0]}'`, () => {
           expect(data.chemin.match(v[0])).toEqual(v[1]);

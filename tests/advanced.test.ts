@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { Chemin, IChemin, CheminParam as P } from '../src/mod';
+import type { IChemin } from '../src/mod';
+import { Chemin, CheminParam as P } from '../src/mod';
 
 test('advanced', () => {
   function matchExact<Params>(chemin: IChemin<Params>, pathname: string): Params | false {

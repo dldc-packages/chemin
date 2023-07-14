@@ -1,4 +1,5 @@
-import { CheminParam, CheminParamAny, cheminParamsEqual } from './CheminParam';
+import type { CheminParamAny } from './CheminParam';
+import { CheminParam, cheminParamsEqual } from './CheminParam';
 import { splitPathname } from './utils';
 
 const defaultCreateChemin = createCreator();
@@ -94,7 +95,7 @@ function createCreator(defaultSerializeOptions: SlashOptions = {}) {
     const chemin: IChemin<any> = {
       [IS_CHEMIN]: true,
       parts,
-      serialize: (params: any | null = null, options: SlashOptions = {}) =>
+      serialize: (params: any = null, options: SlashOptions = {}) =>
         serializeChemin(chemin, params, {
           ...defaultSerializeOptions,
           ...options,

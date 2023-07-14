@@ -45,12 +45,12 @@
     "typecheck:watch": "tsc --watch"
   },
   "devDependencies": {
-    "@types/node": "^20.4.1",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
+    "@types/node": "^20.4.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "@vitest/coverage-v8": "^0.33.0",
     "auto-changelog": "^2.4.0",
-    "eslint": "^8.44.0",
+    "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^3.0.0",
     "release-it": "^16.1.0",
