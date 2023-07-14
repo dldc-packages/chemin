@@ -35,6 +35,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsup --format cjs,esm src/mod.ts --dts src/mod.ts",
+    "changelog": "auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
     "lint": "prettier . --check && eslint . && tsc --noEmit",
     "lint:fix": "prettier . --write . && eslint . --fix",
     "release": "release-it",
@@ -75,7 +76,7 @@
       "publish": true
     },
     "git": {
-      "changelog": "pnpm exec auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs"
+      "changelog": "pnpm run changelog"
     },
     "github": {
       "release": true,
