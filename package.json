@@ -35,6 +35,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsup --format cjs,esm src/mod.ts --dts src/mod.ts",
+    "build:watch": "tsup --watch --format cjs,esm src/mod.ts --dts src/mod.ts",
     "changelog": "auto-changelog --stdout --hide-credit true --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
     "lint": "prettier . --check && eslint . && tsc --noEmit",
     "lint:fix": "prettier . --write . && eslint . --fix",
@@ -54,7 +55,7 @@
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^3.0.0",
-    "release-it": "^16.1.0",
+    "release-it": "^16.1.2",
     "rimraf": "^5.0.1",
     "tsup": "^7.1.0",
     "typescript": "^5.1.6",
