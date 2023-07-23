@@ -220,6 +220,7 @@ describe('build in CheminParams', () => {
     expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'] });
     expect(chemin.match('/')).toEqual(false);
     expect(chemin.match('')).toEqual(false);
+    expect(chemin.match('/3.0')).toEqual(false);
     expect(chemin.match('/3.14')).toEqual(false);
     expect(chemin.match('/3,14')).toEqual(false);
     expect(chemin.match('/43hdhdhd')).toEqual(false);
@@ -240,6 +241,7 @@ describe('build in CheminParams', () => {
     expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'] });
     expect(chemin.match('/3.14')).toEqual({ params: { num: 3 }, rest: [] });
     expect(chemin.match('/3,14')).toEqual({ params: { num: 3 }, rest: [] });
+    expect(chemin.match('/3.0')).toEqual({ params: { num: 3 }, rest: [] });
     expect(chemin.match('/43hdhdhd')).toEqual({ params: { num: 43 }, rest: [] });
     expect(chemin.match('')).toEqual(false);
     expect(chemin.serialize({ num: 3 })).toEqual('/3');

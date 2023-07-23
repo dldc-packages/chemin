@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://github.com/etienne-dldc/chemin/raw/main/design/logo.png" width="900" alt="chemin logo">
+  <img src="https://github.com/dldc-packages/chemin/raw/main/design/logo.png" width="900" alt="chemin logo">
 </p>
 
-# 🥾 Chemin [![Build Status](https://travis-ci.org/etienne-dldc/chemin.svg?branch=master)](https://travis-ci.org/etienne-dldc/chemin) [![](https://badgen.net/bundlephobia/minzip/chemin)](https://bundlephobia.com/result?p=chemin)
+# 🥾 Chemin
 
 > A type-safe pattern builder & route matching library written in TypeScript
 
 ## Gist
 
 ```js
-import { Chemin } from 'chemin';
+import { Chemin } from '@dldc/chemin';
 
 const chemin = Chemin.parse('/admin/post/:postId/delete?');
 
@@ -25,8 +25,9 @@ console.log(chemin.match('/admin/post/e5t89u'));
 Use the `Chemin.create` and `CheminParam` to build more complex **type-safe** paths !
 
 ```ts
-import { Chemin, CheminParam as P } from 'chemin';
+import { Chemin, CheminParam as P } from '@dldc/chemin';
 
+// admin/post/:postId(number)/delete?
 const chemin = Chemin.create('admin', 'post', P.number('postId'), P.optionalConst('delete'));
 
 console.log(chemin.match('/no/valid'));
@@ -35,6 +36,7 @@ console.log(chemin.match('/no/valid'));
 const match = chemin.match('/admin/post/45');
 console.log(match);
 // => { rest: [], params: { postId: 45, delete: false } }
+// match.params is typed as { postId: number, delete: boolean } !
 ```
 
 ## Composition
@@ -42,7 +44,7 @@ console.log(match);
 You can use a `Chemin` inside another to easily compose your routes !
 
 ```ts
-import { Chemin, CheminParam as P } from 'chemin';
+import { Chemin, CheminParam as P } from '@dldc/chemin';
 
 const postFragment = Chemin.create('post', P.number('postId'));
 const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
@@ -55,7 +57,7 @@ console.log(postAdmin.stringify()); // /admin/:userId/post/:postId(number)/edit
 You can create your own `CheminParam` to better fit your application while keeping full type-safety !
 
 ```ts
-import { Chemin, CheminParam } from 'chemin';
+import { Chemin, CheminParam } from '@dldc/chemin';
 
 // match only string of 4 char [a-z0-9]
 function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
@@ -79,8 +81,8 @@ console.log(path.match('/item/A4e3')); // false (Maj)
 console.log(path.match('/item/a4e3')); // { rest: [], params: { itemId: 'a4e3' } }
 ```
 
-> Take a look a [the custom-advanced.ts example](https://github.com/etienne-dldc/chemin/blob/master/examples/custom-advanced.ts).
-> and [the build-in CheminParam](https://github.com/etienne-dldc/chemin/blob/master/src/CheminParam.ts#L23).
+> Take a look a [the custom-advanced.test.ts example](https://github.com/dldc-packages/chemin/blob/main/tests/custom-advanced.test.ts).
+> and [the build-in CheminParam](https://github.com/dldc-packages/chemin/blob/main/src/CheminParam.ts).
 
 ## API
 
@@ -169,7 +171,7 @@ Accepts the same arguments as `chemin.match` but return `false` if the path does
 Return an array of all the `Chemin` it contains (as well as the `Chemin` itself).
 
 ```ts
-import { Chemin } from 'chemin';
+import { Chemin } from '@dldc/chemin';
 
 const admin = Chemin.create('admin');
 const adminUser = Chemin.create(admin, 'user');
@@ -182,7 +184,7 @@ adminUser.extract(); // [adminUser, admin];
 Return a string representation of the chemin.
 
 ```ts
-import { Chemin, CheminParam as P } from 'chemin';
+import { Chemin, CheminParam as P } from '@dldc/chemin';
 
 const postFragment = Chemin.create('post', P.number('postId'));
 const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
@@ -194,7 +196,7 @@ console.log(postAdmin.stringify()); // /admin/:userId/post/:postId(number)/edit
 
 > Split a pathname and prevent empty parts
 
-Accepts a string and returns an array od strings.
+Accepts a string and returns an array of strings.
 
 ```ts
 splitPathname('/admin/user/5'); // ['admin', 'user', '5']
@@ -224,8 +226,7 @@ const chemin = Chemin.create(CheminParam.integer('myInt'));
 Chemin.matchExact(chemin, '/42'); // { myInt: 42 }
 ```
 
-By default it will only match if the parsed number is the same as the raw value.
-You can pass an option object with `strict: false` to allow any valid `parseInt`:
+The `options` parameter is optional and accepts a `strict` boolean property (`true` by default). When strict is set to `true` (the default) it will only match if the parsed number is the same as the raw value (so `1.0` or `42blabla` will not match).
 
 ```ts
 const chemin = Chemin.create(CheminParam.integer('myInt', { strict: false }));
