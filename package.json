@@ -1,6 +1,6 @@
 {
   "name": "@dldc/chemin",
-  "version": "9.0.2",
+  "version": "9.0.3",
   "description": "A type-safe pattern builder & route matching library written in TypeScript",
   "keywords": [
     "path",
