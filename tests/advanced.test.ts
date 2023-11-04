@@ -1,16 +1,7 @@
 import { expect, test } from 'vitest';
-import type { IChemin } from '../src/mod';
 import { Chemin, CheminParam as P } from '../src/mod';
 
 test('advanced', () => {
-  function matchExact<Params>(chemin: IChemin<Params>, pathname: string): Params | false {
-    const match = chemin.match(pathname);
-    if (match !== false && match.rest.length === 0) {
-      return match.params;
-    }
-    return false;
-  }
-
   const ROUTES = (() => {
     const home = Chemin.create();
     const posts = Chemin.create(home, 'posts');
@@ -32,38 +23,22 @@ test('advanced', () => {
     };
   })();
 
-  type MatchAllResult<T> = T extends IChemin<infer P>
-    ? P | false
-    : {
-        [K in keyof T]: MatchAllResult<T[K]>;
-      };
-
-  function matchAll<T extends Record<string, any>>(obj: T, pathname: string): MatchAllResult<T> {
-    if (Chemin.isChemin(obj)) {
-      return matchExact(obj, pathname) as any;
-    }
-    return Object.keys(obj).reduce<any>((acc, key) => {
-      acc[key] = matchAll((obj as any)[key], pathname);
-      return acc;
-    }, {});
-  }
-
   function run(pathname: string) {
-    const adminPostMatch = matchExact(ROUTES.admin.post, pathname);
+    const adminPostMatch = ROUTES.admin.post.matchExact(pathname);
     if (adminPostMatch) {
       return `Admin > Post (id: ${adminPostMatch.postId})${adminPostMatch.delete ? ' > Delete' : ''}`;
     }
-    const routes = matchAll(ROUTES, pathname);
-    if (routes.home) {
+    const routes = Chemin.matchAllNested(ROUTES, pathname);
+    if (routes.home?.exact) {
       return `Welcome Home`;
     }
-    if (routes.post) {
-      return `Post ${routes.post.postId}`;
+    if (routes.post?.exact) {
+      return `Post ${routes.post.params.postId}`;
     }
-    if (routes.posts) {
+    if (routes.posts?.exact) {
       return `Posts`;
     }
-    if (routes.admin.home) {
+    if (routes.admin.home?.exact) {
       return `Admin`;
     }
     return `Not Found`;

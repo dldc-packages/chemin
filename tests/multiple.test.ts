@@ -9,6 +9,6 @@ test('multiple allow zero', () => {
 
 test('multiple atLeastOne', () => {
   const chemin = Chemin.create(CheminParam.multiple(CheminParam.string('categories'), true));
-  expect(chemin.matchExact('/')).toBe(false);
+  expect(chemin.matchExact('/')).toBe(null);
   expect(chemin.matchExact('/foo/bar')).toEqual({ categories: ['foo', 'bar'] });
 });

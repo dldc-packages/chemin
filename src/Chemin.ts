@@ -10,6 +10,9 @@ export const Chemin = {
   parse: parseChemin,
   isChemin,
   matchAll: matchAllChemins,
+  matchAllNested: matchAllCheminsNested,
+  equal: cheminsEqual,
+  partialMatch,
 };
 
 export interface ICheminMatch<Params> {
@@ -18,7 +21,7 @@ export interface ICheminMatch<Params> {
   exact: boolean;
 }
 
-export type TCheminMatchMaybe<Params> = ICheminMatch<Params> | false;
+export type TCheminMatchMaybe<Params> = ICheminMatch<Params> | null;
 
 export type TCreateChemin = typeof defaultCreateChemin;
 
@@ -43,12 +46,12 @@ export interface ISlashOptions {
 
 export interface IChemin<Params = any> {
   [IS_CHEMIN]: Params;
-  parts: Array<TPart>;
+  parts: ReadonlyArray<TPart>;
   serialize: TEmptyObject extends Params
     ? (params?: null, options?: ISlashOptions) => string
     : (params: Params, options?: ISlashOptions) => string;
   match: (pathname: string | Array<string>) => TCheminMatchMaybe<Params>;
-  matchExact: (pathname: string | Array<string>) => Params | false;
+  matchExact: (pathname: string | Array<string>) => Params | null;
   extract: () => Array<IChemin>;
   flatten: () => Array<TCheminParamAny>;
   equal: (other: IChemin) => boolean;
@@ -57,8 +60,20 @@ export interface IChemin<Params = any> {
 
 export type TCheminsRecord = Record<string, IChemin>;
 
-export type TCheminsRecordMatch<Chemins extends TCheminsRecord> = {
+export type TCheminsRecordMatches<Chemins extends TCheminsRecord> = {
   [K in keyof Chemins]: TCheminMatchMaybe<TParams<Chemins[K]>>;
+};
+
+export type TNestedCheminsRecord = {
+  [key: string]: IChemin | TNestedCheminsRecord;
+};
+
+export type TNestedCheminsRecordMatches<Chemins extends TNestedCheminsRecord> = {
+  [K in keyof Chemins]: Chemins[K] extends IChemin<infer P>
+    ? TCheminMatchMaybe<P>
+    : Chemins[K] extends TNestedCheminsRecord
+    ? TNestedCheminsRecordMatches<Chemins[K]>
+    : never;
 };
 
 type TIn = string | TCheminParamAny | IChemin<any>;
@@ -156,19 +171,19 @@ function matchChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<s
   return matchPart(chemin, pathParts);
 }
 
-function matchExactChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): false | Params {
+function matchExactChemin<Params>(chemin: IChemin<Params>, pathname: string | Array<string>): null | Params {
   const match = matchChemin(chemin, pathname);
   if (match && match.rest.length === 0) {
     return match.params;
   }
-  return false;
+  return null;
 }
 
-function matchPart(part: TPart, pathname: Array<string>): ICheminMatch<any> | false {
+function matchPart(part: TPart, pathname: Array<string>): ICheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
-    if (match === false) {
-      return false;
+    if (match === null) {
+      return null;
     }
     return {
       rest: match.rest,
@@ -178,7 +193,7 @@ function matchPart(part: TPart, pathname: Array<string>): ICheminMatch<any> | fa
   }
   const res = part.match(...pathname);
   if (res.match === false) {
-    return false;
+    return null;
   }
   return {
     params: {
@@ -189,19 +204,19 @@ function matchPart(part: TPart, pathname: Array<string>): ICheminMatch<any> | fa
   };
 }
 
-function matchParts(parts: Array<TPart>, pathname: Array<string>): ICheminMatch<any> | false {
+function matchParts(parts: ReadonlyArray<TPart>, pathname: Array<string>): ICheminMatch<any> | null {
   if (parts.length === 0) {
     return { params: {}, rest: pathname, exact: pathname.length === 0 };
   }
   const nextPart = parts[0];
   const nextHasParams = isChemin(nextPart) ? true : !('noValue' in nextPart) || nextPart.noValue !== true;
   const res = matchPart(nextPart, pathname);
-  if (res === false) {
-    return false;
+  if (res === null) {
+    return null;
   }
   const nextRes = matchParts(parts.slice(1), res.rest);
-  if (nextRes === false) {
-    return false;
+  if (nextRes === null) {
+    return null;
   }
   return {
     rest: nextRes.rest,
@@ -284,7 +299,7 @@ function extractChemins(chemin: IChemin): Array<IChemin> {
   return result;
 }
 
-export function cheminsEqual(left: IChemin, right: IChemin): boolean {
+function cheminsEqual(left: IChemin, right: IChemin): boolean {
   if (left === right) {
     return true;
   }
@@ -299,15 +314,45 @@ export function cheminsEqual(left: IChemin, right: IChemin): boolean {
   });
 }
 
-export function matchAllChemins<Chemins extends TCheminsRecord>(
+function matchAllChemins<Chemins extends TCheminsRecord>(
   chemins: Chemins,
   pathname: string | Array<string>,
-): TCheminsRecordMatch<Chemins> {
+): TCheminsRecordMatches<Chemins> {
   const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
-  return Object.fromEntries(
-    Object.entries(chemins).map(([name, chemin]) => {
-      const match = chemin.match(pathParts);
-      return [name, match] as const;
-    }),
-  ) as TCheminsRecordMatch<Chemins>;
+  return Object.keys(chemins).reduce<any>((acc, key) => {
+    const chemin = chemins[key];
+    acc[key] = chemin.match(pathParts);
+    return acc;
+  }, {});
+}
+
+function matchAllCheminsNested<Chemins extends TNestedCheminsRecord>(
+  chemins: Chemins,
+  pathname: string | Array<string>,
+): TNestedCheminsRecordMatches<Chemins> {
+  const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
+  return Object.keys(chemins).reduce<any>((acc, key) => {
+    const chemin = chemins[key];
+    if (isChemin(chemin)) {
+      acc[key] = chemin.match(pathParts);
+      return acc;
+    }
+    acc[key] = matchAllCheminsNested(chemin, pathParts);
+    return acc;
+  }, {});
+}
+
+function partialMatch<Params, ParatialParams>(
+  chemin: IChemin<Params>,
+  match: TCheminMatchMaybe<Params>,
+  part: IChemin<ParatialParams>,
+): null | ParatialParams {
+  if (!match) {
+    return null;
+  }
+  const contains = chemin.extract().includes(part);
+  if (contains === false) {
+    return null;
+  }
+  return match.params as unknown as ParatialParams;
 }

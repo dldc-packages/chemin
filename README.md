@@ -14,10 +14,10 @@ import { Chemin } from '@dldc/chemin';
 const chemin = Chemin.parse('/admin/post/:postId/delete?');
 
 console.log(chemin.match('/no/valid'));
-// => false
+// => null
 
 console.log(chemin.match('/admin/post/e5t89u'));
-// => { rest: [], params: { postId: 'e5t89u', delete: false } }
+// => { rest: [], exact: true, params: { postId: 'e5t89u', delete: false } }
 ```
 
 ## More advanced (and type-safe) patterns
@@ -31,17 +31,17 @@ import { Chemin, CheminParam as P } from '@dldc/chemin';
 const chemin = Chemin.create('admin', 'post', P.number('postId'), P.optionalConst('delete'));
 
 console.log(chemin.match('/no/valid'));
-// => false
+// => null
 
 const match = chemin.match('/admin/post/45');
 console.log(match);
-// => { rest: [], params: { postId: 45, delete: false } }
+// => { rest: [], exact: true, params: { postId: 45, delete: false } }
 // match.params is typed as { postId: number, delete: boolean } !
 ```
 
 ## Composition
 
-You can use a `Chemin` inside another to easily compose your routes !
+You can use a `Chemin` inside another one to easily compose your routes !
 
 ```ts
 import { Chemin, CheminParam as P } from '@dldc/chemin';
@@ -76,9 +76,9 @@ function fourCharStringId<N extends string>(name: N): CheminParam<N, string> {
 }
 
 const path = Chemin.create('item', fourCharStringId('itemId'));
-console.log(path.match('/item/a4e3t')); // false (5 char)
-console.log(path.match('/item/A4e3')); // false (Maj)
-console.log(path.match('/item/a4e3')); // { rest: [], params: { itemId: 'a4e3' } }
+console.log(path.match('/item/a4e3t')); // null (5 char)
+console.log(path.match('/item/A4e3')); // null (beacause A is uppercase)
+console.log(path.match('/item/a4e3')); // { rest: [], exact: true, params: { itemId: 'a4e3' } }
 ```
 
 > Take a look a [the custom-advanced.test.ts example](https://github.com/dldc-packages/chemin/blob/main/tests/custom-advanced.test.ts).
@@ -125,6 +125,51 @@ Accepts one argument and return `true` if it's a `Chemin`, false otherwise.
 Chemin.isChemin(Chemin.parse('/admin')); // true
 ```
 
+### Chemin.partialMatch(chemin, match, part)
+
+> This function let you extract the params of a chemin that part of another one
+
+```ts
+const workspace = Chemin.create('workspace', CheminParam.string('tenant'));
+
+const home = Chemin.create('home');
+const workspaceHome = Chemin.create(workspace, 'home');
+const workspaceSettings = Chemin.create(workspace, 'settings');
+
+const match1 = Chemin.partialMatch(workspaceHome, workspaceHome.match('/workspace/123/home'), workspace);
+// match1 is typed as { tenant: string } | null
+expect(match1).toMatchObject({ tenant: '123' });
+
+const match2 = Chemin.partialMatch(workspaceSettings, workspaceSettings.match('/workspace/123/settings'), workspace);
+expect(match2).toMatchObject({ tenant: '123' });
+
+const match3 = Chemin.partialMatch(home, home.match('/home'), workspace);
+expect(match3).toBe(null);
+```
+
+### Chemin.matchAll(chemins, pathname)
+
+> Given an object of `Chemin` and a `pathname` return an new object with the result of `Chemin.match` fir each keys
+
+```ts
+const chemins = {
+  home: Chemin.create('home'),
+  workspace: Chemin.create('workspace', CheminParam.string('tenant')),
+  workspaceSettings: Chemin.create('workspace', CheminParam.string('tenant'), 'settings'),
+};
+
+const match = Chemin.matchAll(chemins, '/workspace/123/settings');
+expect(match).toEqual({
+  home: null,
+  workspace: { rest: ['settings'], exact: false, params: { tenant: '123' } },
+  workspaceSettings: { rest: [], exact: true, params: { tenant: '123' } },
+});
+```
+
+### Chemin.matchAllNested(chemins, pathname)
+
+> Same as `Chemin.matchAll` but also match nested objects
+
 ### chemin.parts
 
 > An array of the parts (other `Chemin`s or `CheminParam`s) that make the chemin.
@@ -153,18 +198,19 @@ chemin.serialize({ userId: 42, edit: true }); // /admin/42/edit
 
 > Test a chemin against a pathanme
 
-Accepts a `pathname` and return `false` or `CheminMatchResult`.
+Accepts a `pathname` and return `null` or `TCheminMatchMaybe`.
 
 - `pathname` can be either a string (`/admin/user/5`) or an array of strings (`['admin', 'user', '5']`)
-- `CheminMatchResult` is an object with two properties
+- `TCheminMatchMaybe` is an object with three properties
   - `rest`: an array of string of the remaining parts of the pathname once the matching is done
+  - `exact`: a boolean indicating if the match is exact or not (if `rest` is empty or not)
   - `params`: an object of params extracted from the matching
 
-**Note**: If you want to pass an array to `pathname` make sure to use `splitPathname`.
+**Note**: When `pathname` is a `string`, it is splitted using the `splitPathname` function. This function is exported so you can use it to split your pathnames in the same way.
 
 ### chemin.matchExact(pathname)
 
-Accepts the same arguments as `chemin.match` but return `false` if the path does not match or if `rest` is not empty, otherwise it returns the `params` object directly.
+Accepts the same arguments as `chemin.match` but return `null` if the path does not match or if `rest` is not empty, otherwise it returns the `params` object directly.
 
 ### chemin.extract()
 
@@ -178,6 +224,8 @@ const adminUser = Chemin.create(admin, 'user');
 
 adminUser.extract(); // [adminUser, admin];
 ```
+
+**Note**: You probably don't need this but it's used internally in `Chemin.partialMatch`
 
 ### chemin.stringify()
 
