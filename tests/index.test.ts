@@ -20,13 +20,13 @@ describe('Make sure different chemins return the correct match', () => {
     {
       chemin: Chemin.parse('/'),
       tests: [
-        ['/', { params: {}, rest: [] }],
-        ['//', { params: {}, rest: [''] }],
-        ['', { params: {}, rest: [] }],
-        ['/foo', { params: {}, rest: ['foo'] }],
-        ['/foo/', { params: {}, rest: ['foo'] }],
-        ['/foo/bar', { params: {}, rest: ['foo', 'bar'] }],
-        ['/foo/bar/', { params: {}, rest: ['foo', 'bar'] }],
+        ['/', { params: {}, rest: [], exact: true }],
+        ['//', { params: {}, rest: [''], exact: false }],
+        ['', { params: {}, rest: [], exact: true }],
+        ['/foo', { params: {}, rest: ['foo'], exact: false }],
+        ['/foo/', { params: {}, rest: ['foo'], exact: false }],
+        ['/foo/bar', { params: {}, rest: ['foo', 'bar'], exact: false }],
+        ['/foo/bar/', { params: {}, rest: ['foo', 'bar'], exact: false }],
       ],
     },
     {
@@ -34,10 +34,10 @@ describe('Make sure different chemins return the correct match', () => {
       tests: [
         ['/', false],
         ['', false],
-        ['/admin', { params: {}, rest: [] }],
-        ['/admin/', { params: {}, rest: [] }],
-        ['/admin/home', { params: {}, rest: ['home'] }],
-        ['/admin/home/', { params: {}, rest: ['home'] }],
+        ['/admin', { params: {}, rest: [], exact: true }],
+        ['/admin/', { params: {}, rest: [], exact: true }],
+        ['/admin/home', { params: {}, rest: ['home'], exact: false }],
+        ['/admin/home/', { params: {}, rest: ['home'], exact: false }],
         ['/adminnnn/', false],
         ['/admi', false],
       ],
@@ -47,14 +47,15 @@ describe('Make sure different chemins return the correct match', () => {
       tests: [
         ['/', false],
         ['', false],
-        ['/admin', { params: { tool: { present: false } }, rest: [] }],
-        ['/admin/', { params: { tool: { present: false } }, rest: [] }],
-        ['/admin/home', { params: { tool: { present: true, value: 'home' } }, rest: [] }],
+        ['/admin', { params: { tool: { present: false } }, rest: [], exact: true }],
+        ['/admin/', { params: { tool: { present: false } }, rest: [], exact: true }],
+        ['/admin/home', { params: { tool: { present: true, value: 'home' } }, rest: [], exact: true }],
         [
           '/admin/blabla/then',
           {
             params: { tool: { present: true, value: 'blabla' } },
             rest: ['then'],
+            exact: false,
           },
         ],
       ],
@@ -172,7 +173,7 @@ test('extract twice should return the same array', () => {
 test('match usung splitPathname', () => {
   const chemin = Chemin.create('foo', 'bar', P.optionalConst('baz'));
   const parts = splitPathname('/foo/bar');
-  expect(chemin.match(parts)).toEqual({ params: { baz: false }, rest: [] });
+  expect(chemin.match(parts)).toEqual({ params: { baz: false }, rest: [], exact: true });
 });
 
 test('splitPathname without trainlingSlash', () => {
@@ -197,7 +198,7 @@ test('use the same chemin twice', () => {
   expect(chemin.serialize()).toEqual('/foo/bar/foo/bar');
   expect(chemin.extract().length).toEqual(2);
   expect(chemin.serialize(null, { trailingSlash: true })).toEqual('/foo/bar/foo/bar/');
-  expect(chemin.match('/foo/bar/foo/bar')).toEqual({ params: {}, rest: [] });
+  expect(chemin.match('/foo/bar/foo/bar')).toEqual({ params: {}, rest: [], exact: true });
   expect(chemin.match('/foo/bar')).toEqual(false);
 });
 
@@ -205,8 +206,8 @@ describe('build in CheminParams', () => {
   test('constant', () => {
     const chemin = Chemin.create(P.constant('foo'));
     expect(chemin.match('/')).toEqual(false);
-    expect(chemin.match('/foo')).toEqual({ params: {}, rest: [] });
-    expect(chemin.match('/foo/bar')).toEqual({ params: {}, rest: ['bar'] });
+    expect(chemin.match('/foo')).toEqual({ params: {}, rest: [], exact: true });
+    expect(chemin.match('/foo/bar')).toEqual({ params: {}, rest: ['bar'], exact: false });
     expect(chemin.match('/fooo/foo/bar')).toEqual(false);
     expect(chemin.match('')).toEqual(false);
     expect(chemin.serialize()).toEqual('/foo');
@@ -214,10 +215,10 @@ describe('build in CheminParams', () => {
 
   test('integer', () => {
     const chemin = Chemin.create(P.integer('num'));
-    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'] });
-    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'] });
+    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'], exact: false });
+    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'], exact: false });
     expect(chemin.match('/')).toEqual(false);
     expect(chemin.match('')).toEqual(false);
     expect(chemin.match('/3.0')).toEqual(false);
@@ -235,14 +236,14 @@ describe('build in CheminParams', () => {
   test('integer (strict:false)', () => {
     const chemin = Chemin.create(P.integer('num', { strict: false }));
     expect(chemin.match('/')).toEqual(false);
-    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'] });
-    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'] });
-    expect(chemin.match('/3.14')).toEqual({ params: { num: 3 }, rest: [] });
-    expect(chemin.match('/3,14')).toEqual({ params: { num: 3 }, rest: [] });
-    expect(chemin.match('/3.0')).toEqual({ params: { num: 3 }, rest: [] });
-    expect(chemin.match('/43hdhdhd')).toEqual({ params: { num: 43 }, rest: [] });
+    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'], exact: false });
+    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'], exact: false });
+    expect(chemin.match('/3.14')).toEqual({ params: { num: 3 }, rest: [], exact: true });
+    expect(chemin.match('/3,14')).toEqual({ params: { num: 3 }, rest: [], exact: true });
+    expect(chemin.match('/3.0')).toEqual({ params: { num: 3 }, rest: [], exact: true });
+    expect(chemin.match('/43hdhdhd')).toEqual({ params: { num: 43 }, rest: [], exact: true });
     expect(chemin.match('')).toEqual(false);
     expect(chemin.serialize({ num: 3 })).toEqual('/3');
   });
@@ -250,46 +251,49 @@ describe('build in CheminParams', () => {
   test('number', () => {
     const chemin = Chemin.create(P.number('num'));
     expect(chemin.match('/')).toEqual(false);
-    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [] });
-    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'] });
-    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'] });
-    expect(chemin.match('/3.14')).toEqual({ params: { num: 3.14 }, rest: [] });
-    expect(chemin.match('/3,14')).toEqual({ params: { num: 3 }, rest: [] });
-    expect(chemin.match('/43hdhdhd')).toEqual({ params: { num: 43 }, rest: [] });
+    expect(chemin.match('/45')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/')).toEqual({ params: { num: 45 }, rest: [], exact: true });
+    expect(chemin.match('/45/foo')).toEqual({ params: { num: 45 }, rest: ['foo'], exact: false });
+    expect(chemin.match('/45/999')).toEqual({ params: { num: 45 }, rest: ['999'], exact: false });
+    expect(chemin.match('/3.14')).toEqual({ params: { num: 3.14 }, rest: [], exact: true });
+    expect(chemin.match('/3,14')).toEqual({ params: { num: 3 }, rest: [], exact: true });
+    expect(chemin.match('/43hdhdhd')).toEqual({ params: { num: 43 }, rest: [], exact: true });
     expect(chemin.match('')).toEqual(false);
-    expect(chemin.match('/Infinity')).toEqual({ params: { num: Infinity }, rest: [] });
-    expect(chemin.match('/10e2')).toEqual({ params: { num: 1000 }, rest: [] });
+    expect(chemin.match('/Infinity')).toEqual({ params: { num: Infinity }, rest: [], exact: true });
+    expect(chemin.match('/10e2')).toEqual({ params: { num: 1000 }, rest: [], exact: true });
     expect(chemin.serialize({ num: 3.1415 })).toEqual('/3.1415');
   });
 
   test('string', () => {
     const chemin = Chemin.create(P.string('str'));
     expect(chemin.match('/')).toEqual(false);
-    expect(chemin.match('/foo')).toEqual({ params: { str: 'foo' }, rest: [] });
-    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'] });
-    expect(chemin.match('/45')).toEqual({ params: { str: '45' }, rest: [] });
+    expect(chemin.match('/foo')).toEqual({ params: { str: 'foo' }, rest: [], exact: true });
+    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'], exact: false });
+    expect(chemin.match('/45')).toEqual({ params: { str: '45' }, rest: [], exact: true });
     expect(chemin.match('')).toEqual(false);
     expect(chemin.serialize({ str: 'hey' })).toEqual('/hey');
   });
 
   test('optional', () => {
     const chemin = Chemin.create(P.optional(P.integer('num')));
-    expect(chemin.match('/')).toEqual({ params: { num: { present: false } }, rest: [] });
-    expect(chemin.match('/foo')).toEqual({ params: { num: { present: false } }, rest: ['foo'] });
+    expect(chemin.match('/')).toEqual({ params: { num: { present: false } }, rest: [], exact: true });
+    expect(chemin.match('/foo')).toEqual({ params: { num: { present: false } }, rest: ['foo'], exact: false });
     expect(chemin.match('/foo/bar')).toEqual({
       params: { num: { present: false } },
       rest: ['foo', 'bar'],
+      exact: false,
     });
     expect(chemin.match('/45')).toEqual({
       params: { num: { present: true, value: 45 } },
       rest: [],
+      exact: true,
     });
     expect(chemin.match('/45/foo')).toEqual({
       params: { num: { present: true, value: 45 } },
       rest: ['foo'],
+      exact: false,
     });
-    expect(chemin.match('')).toEqual({ params: { num: { present: false } }, rest: [] });
+    expect(chemin.match('')).toEqual({ params: { num: { present: false } }, rest: [], exact: true });
     expect(chemin.serialize({ num: { present: true, value: 54 } })).toEqual('/54');
     expect(chemin.serialize({ num: { present: false } })).toEqual('/');
     expect(chemin.stringify()).toEqual('/:num(interger)?');
@@ -297,13 +301,14 @@ describe('build in CheminParams', () => {
 
   test('optionalConst', () => {
     const chemin = Chemin.create(P.optionalConst('str', 'some-string'));
-    expect(chemin.match('/')).toEqual({ params: { str: false }, rest: [] });
-    expect(chemin.match('')).toEqual({ params: { str: false }, rest: [] });
-    expect(chemin.match('/some-string')).toEqual({ params: { str: true }, rest: [] });
-    expect(chemin.match('/some-string/bar')).toEqual({ params: { str: true }, rest: ['bar'] });
+    expect(chemin.match('/')).toEqual({ params: { str: false }, rest: [], exact: true });
+    expect(chemin.match('')).toEqual({ params: { str: false }, rest: [], exact: true });
+    expect(chemin.match('/some-string')).toEqual({ params: { str: true }, rest: [], exact: true });
+    expect(chemin.match('/some-string/bar')).toEqual({ params: { str: true }, rest: ['bar'], exact: false });
     expect(chemin.match('/foo/some-string')).toEqual({
       params: { str: false },
       rest: ['foo', 'some-string'],
+      exact: false,
     });
     expect(chemin.serialize({ str: true })).toEqual('/some-string');
     expect(chemin.serialize({ str: false })).toEqual('/');
@@ -312,11 +317,11 @@ describe('build in CheminParams', () => {
 
   test('optionalString', () => {
     const chemin = Chemin.create(P.optionalString('str'));
-    expect(chemin.match('/')).toEqual({ params: { str: false }, rest: [] });
-    expect(chemin.match('')).toEqual({ params: { str: false }, rest: [] });
-    expect(chemin.match('/foo')).toEqual({ params: { str: 'foo' }, rest: [] });
-    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'] });
-    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'] });
+    expect(chemin.match('/')).toEqual({ params: { str: false }, rest: [], exact: true });
+    expect(chemin.match('')).toEqual({ params: { str: false }, rest: [], exact: true });
+    expect(chemin.match('/foo')).toEqual({ params: { str: 'foo' }, rest: [], exact: true });
+    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'], exact: false });
+    expect(chemin.match('/foo/bar')).toEqual({ params: { str: 'foo' }, rest: ['bar'], exact: false });
     expect(chemin.serialize({ str: 'hey' })).toEqual('/hey');
     expect(chemin.serialize({ str: false })).toEqual('/');
     expect(chemin.stringify()).toEqual('/:str?');
@@ -324,19 +329,22 @@ describe('build in CheminParams', () => {
 
   test('multiple', () => {
     const chemin = Chemin.create(P.multiple(P.string('categories')));
-    expect(chemin.match('/')).toEqual({ params: { categories: [] }, rest: [] });
-    expect(chemin.match('')).toEqual({ params: { categories: [] }, rest: [] });
+    expect(chemin.match('/')).toEqual({ params: { categories: [] }, rest: [], exact: true });
+    expect(chemin.match('')).toEqual({ params: { categories: [] }, rest: [], exact: true });
     expect(chemin.match('/some/foo/bar')).toEqual({
       params: { categories: ['some', 'foo', 'bar'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.match('/cat1/cat2')).toEqual({
       params: { categories: ['cat1', 'cat2'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.match('/single')).toEqual({
       params: { categories: ['single'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.serialize({ categories: ['hey'] })).toEqual('/hey');
     expect(chemin.serialize({ categories: [] })).toEqual('/');
@@ -350,14 +358,17 @@ describe('build in CheminParams', () => {
     expect(chemin.match('/some/foo/bar')).toEqual({
       params: { categories: ['some', 'foo', 'bar'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.match('/cat1/cat2')).toEqual({
       params: { categories: ['cat1', 'cat2'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.match('/single')).toEqual({
       params: { categories: ['single'] },
       rest: [],
+      exact: true,
     });
     expect(chemin.serialize({ categories: ['hey'] })).toEqual('/hey');
     expect(chemin.stringify()).toEqual('/:categories+');

@@ -1,3 +1,5 @@
+import type { TEmptyObject } from './Chemin';
+
 export const CheminParam = {
   number,
   integer,
@@ -28,7 +30,7 @@ export interface ICheminParamBase<N extends string, T, Meta> {
 }
 
 export type TCheminParam<N extends string, T, Meta = null> = ICheminParamBase<N, T, Meta> &
-  (T extends void ? { noValue: true } : {});
+  (T extends void ? { noValue: true } : TEmptyObject);
 
 export type TCheminParamAny = TCheminParam<any, any, any>;
 

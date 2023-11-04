@@ -8,5 +8,6 @@ test('create', () => {
   expect(chemin.match('/admin/post/45')).toEqual({
     rest: [],
     params: { postId: 45, delete: false },
+    exact: true,
   });
 });

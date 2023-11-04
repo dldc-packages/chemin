@@ -25,5 +25,5 @@ test('custom matcher', () => {
   const path = Chemin.create('item', fourCharStringId('itemId'));
   expect(path.match('/item/a4e3t')).toBe(false);
   expect(path.match('/item/A4e3')).toBe(false);
-  expect(path.match('/item/a4e3')).toEqual({ rest: [], params: { itemId: 'a4e3' } });
+  expect(path.match('/item/a4e3')).toEqual({ rest: [], params: { itemId: 'a4e3' }, exact: true });
 });

@@ -38,5 +38,5 @@ test('custom advanced', () => {
 
   const match = path.match('/item/42-etienne');
 
-  expect(match).toEqual({ params: { itemId: { name: 'etienne', num: 42 } }, rest: [] });
+  expect(match).toEqual({ params: { itemId: { name: 'etienne', num: 42 } }, rest: [], exact: true });
 });
