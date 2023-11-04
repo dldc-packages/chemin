@@ -91,7 +91,7 @@ function createCreator(defaultSerializeOptions: ISlashOptions = {}) {
    */
 
   // prettier-ignore
-  function createChemin(): IChemin<{}>;
+  function createChemin(): IChemin<TEmptyObject>;
   // prettier-ignore
   function createChemin<P0 extends TIn>(p0: P0): IChemin<TParams<P0>>;
   // prettier-ignore
