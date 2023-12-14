@@ -1,8 +1,10 @@
-import { CheminParam, cheminParamsEqual, type TCheminParam, type TCheminParamAny } from './CheminParam';
 import { IS_CHEMIN } from './internal';
+import { CheminParam, cheminParamsEqual, type TCheminParam, type TCheminParamAny } from './params';
 import { splitPathname } from './utils';
 
 const defaultCreateChemin = createCreator();
+
+export type TCheminCreator = typeof defaultCreateChemin;
 
 export const Chemin = {
   createCreator,
@@ -355,4 +357,24 @@ function partialMatch<Params, ParatialParams>(
     return null;
   }
   return match.params as unknown as ParatialParams;
+}
+
+export type TCheminsNamespaced<Base extends string | TCheminParamAny | IChemin, Chemins extends TCheminsRecord> = {
+  [K in keyof Chemins]: IChemin<Chemins[K][typeof IS_CHEMIN] & TParams<Base>>;
+};
+
+/**
+ * Add a base to a set of chemins
+ */
+function namespace<Base extends string | TCheminParamAny | IChemin, Chemins extends TCheminsRecord>(
+  base: Base,
+  chemins: Chemins,
+  create: TCheminCreator = defaultCreateChemin,
+): TCheminsNamespaced<Base, Chemins> {
+  const result: Record<string, IChemin> = {};
+  Object.keys(chemins).forEach((key) => {
+    const chemin = chemins[key];
+    result[key] = create(base, chemin);
+  });
+  return result as TCheminsNamespaced<Base, Chemins>;
 }

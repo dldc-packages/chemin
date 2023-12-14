@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
-import { Chemin } from '../src/Chemin';
-import { CheminParam } from '../src/CheminParam';
+import { Chemin } from '../src/chemin.temp';
+import { CheminParam } from '../src/params';
 
 test('Example', () => {
   const workspace = Chemin.create('workspace', CheminParam.string('tenant'));

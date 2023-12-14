@@ -1,3 +1,3 @@
-export * from './Chemin';
-export * from './CheminParam';
+export * from './chemin.temp';
+export * from './params';
 export * from './utils';

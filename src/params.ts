@@ -1,4 +1,4 @@
-import type { TEmptyObject } from './Chemin';
+import type { TEmptyObject } from './chemin.temp';
 
 export const CheminParam = {
   number,
