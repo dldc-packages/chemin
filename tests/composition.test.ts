@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
-import { Chemin, CheminParam as P } from '../src/mod';
+import { chemin, pNumber, pString } from '../src/mod';
 
 test('composition', () => {
-  const postFragment = Chemin.create('post', P.number('postId'));
-  const postAdmin = Chemin.create('admin', P.string('userId'), postFragment, 'edit');
+  const postFragment = chemin('post', pNumber('postId'));
+  const postAdmin = chemin('admin', pString('userId'), postFragment, 'edit');
 
   expect(postAdmin.stringify()).toBe('/admin/:userId/post/:postId(number)/edit');
 });

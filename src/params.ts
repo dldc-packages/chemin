@@ -1,42 +1,8 @@
-import type { TEmptyObject } from './chemin.temp';
+import type { ICheminParamBase, TCheminParam, TPartMatchResult } from './types';
 
-export const CheminParam = {
-  number,
-  integer,
-  string,
-  constant,
-  optional,
-  optionalConst,
-  optionalString,
-  multiple,
-};
-
-export type TPartMatchResult<T> =
-  | { match: false }
-  | { match: true; value: T extends void ? null : T; next: Array<string> };
-export type TPartMatch<T> = (...parts: Array<string>) => TPartMatchResult<T>;
-export type TPartSerialize<T> = (value: T) => string | null;
-export type TPartIsEqual<N extends string, T, Meta> = (other: TCheminParam<N, T, Meta>) => boolean;
-export type TPartStringify = () => string;
-
-export interface ICheminParamBase<N extends string, T, Meta> {
-  name: N;
-  match: TPartMatch<T>;
-  stringify: TPartStringify;
-  serialize: TPartSerialize<T>;
-  meta: Meta;
-  isEqual: TPartIsEqual<string, any, Meta>;
-  factory: (...args: Array<any>) => TCheminParam<N, T, Meta>;
-}
-
-export type TCheminParam<N extends string, T, Meta = null> = ICheminParamBase<N, T, Meta> &
-  (T extends void ? { noValue: true } : TEmptyObject);
-
-export type TCheminParamAny = TCheminParam<any, any, any>;
-
-function string<N extends string>(name: N): TCheminParam<N, string> {
+export function pString<N extends string>(name: N): TCheminParam<N, string> {
   return {
-    factory: string,
+    factory: pString,
     name,
     meta: null,
     isEqual: (other) => other.name === name,
@@ -51,10 +17,10 @@ function string<N extends string>(name: N): TCheminParam<N, string> {
   };
 }
 
-function number<N extends string>(name: N): TCheminParam<N, number> {
+export function pNumber<N extends string>(name: N): TCheminParam<N, number> {
   return {
     name,
-    factory: number,
+    factory: pNumber,
     meta: null,
     isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
@@ -69,7 +35,7 @@ function number<N extends string>(name: N): TCheminParam<N, number> {
   };
 }
 
-function integer<N extends string>(
+export function pInteger<N extends string>(
   name: N,
   options: {
     strict?: boolean;
@@ -80,7 +46,7 @@ function integer<N extends string>(
     name,
     meta: { strict },
     isEqual: (other) => strict === other.meta.strict,
-    factory: integer,
+    factory: pInteger,
     match: (value, ...rest) => {
       if (!value) {
         return { match: false };
@@ -107,12 +73,12 @@ function integer<N extends string>(
   };
 }
 
-function constant<N extends string>(name: N): TCheminParam<N, void> {
+export function pConstant<N extends string>(name: N): TCheminParam<N, void> {
   return {
     name,
     noValue: true,
     meta: null,
-    factory: constant,
+    factory: pConstant,
     isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
       if (name === value) {
@@ -127,13 +93,13 @@ function constant<N extends string>(name: N): TCheminParam<N, void> {
 
 type OptionalValue<T> = { present: false } | { present: true; value: T };
 
-function optional<N extends string, T>(
+export function pOptional<N extends string, T>(
   sub: TCheminParam<N, T, any>,
 ): TCheminParam<N, OptionalValue<T>, { sub: TCheminParam<N, T, any> }> {
   return {
     name: sub.name,
     meta: { sub },
-    factory: optional,
+    factory: pOptional,
     isEqual: (other) => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
     match: (...all) => {
       const subMatch = sub.match(...all);
@@ -151,13 +117,13 @@ function optional<N extends string, T>(
   };
 }
 
-function optionalConst<N extends string>(
+export function pOptionalConst<N extends string>(
   name: N,
   constant: string = name,
 ): TCheminParam<N, boolean, { constant: string }> {
   return {
     name,
-    factory: optionalConst,
+    factory: pOptionalConst,
     meta: { constant },
     isEqual: (other) => other.meta.constant === constant && other.name === name,
     match: (...all) => {
@@ -171,11 +137,11 @@ function optionalConst<N extends string>(
   };
 }
 
-function optionalString<N extends string>(name: N): TCheminParam<N, string | false> {
+export function pOptionalString<N extends string>(name: N): TCheminParam<N, string | false> {
   return {
     name,
     meta: null,
-    factory: optionalString,
+    factory: pOptionalString,
     isEqual: (other) => other.name === name,
     match: (...all) => {
       if (typeof all[0] === 'string' && all[0].length > 0) {
@@ -188,19 +154,19 @@ function optionalString<N extends string>(name: N): TCheminParam<N, string | fal
   };
 }
 
-function multiple<N extends string, T, Meta>(
+export function pMultiple<N extends string, T, Meta>(
   sub: TCheminParam<N, T, Meta>,
   atLeastOne: boolean = false,
 ): TCheminParam<N, Array<T>, { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }> {
   return {
     name: sub.name,
     meta: { atLeastOne, sub },
-    factory: multiple,
+    factory: pMultiple,
     isEqual: (other) =>
       sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) && atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
-      let next = all;
+      let next = all as readonly string[];
       let nextMatch: TPartMatchResult<T>;
       do {
         nextMatch = sub.match(...next);

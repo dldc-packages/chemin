@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest';
-import type { TCheminParam } from '../src/mod';
-import { Chemin } from '../src/mod';
+import { chemin, type TCheminParam } from '../src/mod';
 
 test('custom advanced', () => {
   interface CustomId {
@@ -9,9 +8,9 @@ test('custom advanced', () => {
   }
 
   // match id 45-paul
-  function customId<N extends string>(name: N): TCheminParam<N, CustomId> {
+  function pCustomId<N extends string>(name: N): TCheminParam<N, CustomId> {
     return {
-      factory: customId,
+      factory: pCustomId,
       name,
       isEqual: (other) => other.name === name,
       meta: null,
@@ -34,7 +33,7 @@ test('custom advanced', () => {
     };
   }
 
-  const path = Chemin.create('item', customId('itemId'));
+  const path = chemin('item', pCustomId('itemId'));
 
   const match = path.match('/item/42-etienne');
 
