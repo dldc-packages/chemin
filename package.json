@@ -20,22 +20,22 @@
   "license": "MIT",
   "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/mod.mjs",
-      "require": "./dist/mod.js",
+      "import": "./dist/mod.js",
+      "require": "./dist/mod.cjs",
       "types": "./dist/mod.d.ts"
     }
   },
   "main": "./dist/mod.js",
-  "module": "./dist/mod.mjs",
   "types": "./dist/mod.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rimraf dist && tsup --format cjs,esm src/mod.ts --dts src/mod.ts",
-    "build:watch": "tsup --watch --format cjs,esm src/mod.ts --dts src/mod.ts",
+    "build": "rimraf dist && tsup --format cjs,esm src/mod.ts --dts",
+    "build:watch": "tsup --watch --format cjs,esm src/mod.ts --dts",
     "changelog": "auto-changelog --stdout --hide-credit true --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
     "lint": "prettier . --check && eslint . && tsc --noEmit",
     "lint:fix": "prettier . --write . && eslint . --fix",
