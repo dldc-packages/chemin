@@ -18,8 +18,8 @@ export type TNestedCheminsRecordMatches<Chemins extends TNestedCheminsRecord> = 
   [K in keyof Chemins]: Chemins[K] extends IChemin<infer P>
     ? TCheminMatchMaybe<P>
     : Chemins[K] extends TNestedCheminsRecord
-    ? TNestedCheminsRecordMatches<Chemins[K]>
-    : never;
+      ? TNestedCheminsRecordMatches<Chemins[K]>
+      : never;
 };
 
 export function matchAll<Chemins extends TCheminsRecord>(

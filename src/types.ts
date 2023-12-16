@@ -23,12 +23,12 @@ export type TEmptyObject = Record<never, never>;
 export type TParams<T> = T extends string
   ? TEmptyObject
   : T extends IChemin<infer P>
-  ? P
-  : T extends TCheminParam<any, void, any>
-  ? TEmptyObject
-  : T extends TCheminParam<infer N, infer P, any>
-  ? { [K in N]: P }
-  : TEmptyObject;
+    ? P
+    : T extends TCheminParam<any, void, any>
+      ? TEmptyObject
+      : T extends TCheminParam<infer N, infer P, any>
+        ? { [K in N]: P }
+        : TEmptyObject;
 
 export interface ISlashOptions {
   readonly leadingSlash?: boolean;
