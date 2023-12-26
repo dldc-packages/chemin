@@ -87,10 +87,10 @@
     "root": true
   },
   "devDependencies": {
-    "@types/node": "^20.10.4",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "@vitest/coverage-v8": "^1.0.4",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "@vitest/coverage-v8": "^1.1.0",
     "auto-changelog": "^2.4.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -99,7 +99,7 @@
     "rimraf": "^5.0.5",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^1.1.0"
   },
   "packageManager": "pnpm@8.9.0",
   "publishConfig": {
