@@ -23,9 +23,9 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/mod.d.ts",
       "import": "./dist/mod.js",
-      "require": "./dist/mod.cjs",
-      "types": "./dist/mod.d.ts"
+      "require": "./dist/mod.cjs"
     }
   },
   "main": "./dist/mod.js",
