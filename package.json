@@ -43,6 +43,7 @@
     "test": "pnpm run lint && vitest run --coverage",
     "test:run": "vitest run",
     "test:watch": "vitest --watch",
+    "test:watch:coverage": "vitest --watch --coverage",
     "typecheck": "tsc",
     "typecheck:watch": "tsc --watch"
   },
