@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "before:init": ["pnpm run build", "pnpm test"]
+  },
+  "npm": {
+    "publish": true
+  },
+  "git": {
+    "changelog": "pnpm run --silent changelog"
+  },
+  "github": {
+    "release": true,
+    "web": true
+  }
+}
