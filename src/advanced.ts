@@ -1,8 +1,15 @@
-import { chemin } from './chemin';
-import { isChemin } from './core';
-import type { IS_CHEMIN } from './internal';
-import type { IChemin, ICheminMatch, TCheminMatchMaybe, TCheminParamAny, TCreateChemin, TParams } from './types';
-import { splitPathname } from './utils';
+import { chemin } from "./chemin.ts";
+import { isChemin } from "./core.ts";
+import type { IS_CHEMIN } from "./internal.ts";
+import type {
+  IChemin,
+  ICheminMatch,
+  TCheminMatchMaybe,
+  TCheminParamAny,
+  TCreateChemin,
+  TParams,
+} from "./types.ts";
+import { splitPathname } from "./utils.ts";
 
 export type TCheminsRecord = Record<string, IChemin>;
 
@@ -14,19 +21,22 @@ export type TNestedCheminsRecord = {
   [key: string]: IChemin | TNestedCheminsRecord;
 };
 
-export type TNestedCheminsRecordMatches<Chemins extends TNestedCheminsRecord> = {
-  [K in keyof Chemins]: Chemins[K] extends IChemin<infer P>
-    ? TCheminMatchMaybe<P>
-    : Chemins[K] extends TNestedCheminsRecord
-      ? TNestedCheminsRecordMatches<Chemins[K]>
+export type TNestedCheminsRecordMatches<Chemins extends TNestedCheminsRecord> =
+  {
+    [K in keyof Chemins]: Chemins[K] extends IChemin<infer P>
+      ? TCheminMatchMaybe<P>
+      : Chemins[K] extends TNestedCheminsRecord
+        ? TNestedCheminsRecordMatches<Chemins[K]>
       : never;
-};
+  };
 
 export function matchAll<Chemins extends TCheminsRecord>(
   chemins: Chemins,
   pathname: string | Array<string>,
 ): TCheminsRecordMatches<Chemins> {
-  const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
+  const pathParts = typeof pathname === "string"
+    ? splitPathname(pathname)
+    : pathname;
   return Object.keys(chemins).reduce<any>((acc, key) => {
     const chemin = chemins[key];
     acc[key] = chemin.match(pathParts);
@@ -38,7 +48,9 @@ export function matchAllNested<Chemins extends TNestedCheminsRecord>(
   chemins: Chemins,
   pathname: string | Array<string>,
 ): TNestedCheminsRecordMatches<Chemins> {
-  const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
+  const pathParts = typeof pathname === "string"
+    ? splitPathname(pathname)
+    : pathname;
   return Object.keys(chemins).reduce<any>((acc, key) => {
     const chemin = chemins[key];
     if (isChemin(chemin)) {
@@ -65,14 +77,20 @@ export function partialMatch<Params, PartialParams>(
   return match.params as unknown as PartialParams;
 }
 
-export type TCheminsNamespaced<Base extends string | TCheminParamAny | IChemin, Chemins extends TCheminsRecord> = {
+export type TCheminsNamespaced<
+  Base extends string | TCheminParamAny | IChemin,
+  Chemins extends TCheminsRecord,
+> = {
   [K in keyof Chemins]: IChemin<Chemins[K][typeof IS_CHEMIN] & TParams<Base>>;
 };
 
 /**
  * Add a base to a set of chemins
  */
-export function namespace<Base extends string | TCheminParamAny | IChemin, Chemins extends TCheminsRecord>(
+export function namespace<
+  Base extends string | TCheminParamAny | IChemin,
+  Chemins extends TCheminsRecord,
+>(
   base: Base,
   chemins: Chemins,
   create: TCreateChemin = chemin,
@@ -85,11 +103,17 @@ export function namespace<Base extends string | TCheminParamAny | IChemin, Chemi
   return result as TCheminsNamespaced<Base, Chemins>;
 }
 
-export type Prefixed<Prefix extends string, Children extends Record<string, any>> = {
+export type Prefixed<
+  Prefix extends string,
+  Children extends Record<string, any>,
+> = {
   [K in keyof Children as `${Prefix}.${K & string}`]: Children[K];
 };
 
-export function prefix<Prefix extends string, Children extends Record<string, any>>(
+export function prefix<
+  Prefix extends string,
+  Children extends Record<string, any>,
+>(
   prefix: Prefix,
   children: Children,
 ): Prefixed<Prefix, Children> {
@@ -108,8 +132,13 @@ export interface IFirstMatchResult {
 /**
  * Match a pathname against a list of chemins and return the first match
  */
-export function matchFirst(chemins: Array<IChemin>, pathname: string | Array<string>): IFirstMatchResult | null {
-  const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
+export function matchFirst(
+  chemins: Array<IChemin>,
+  pathname: string | Array<string>,
+): IFirstMatchResult | null {
+  const pathParts = typeof pathname === "string"
+    ? splitPathname(pathname)
+    : pathname;
   for (let i = 0; i < chemins.length; i++) {
     const chemin = chemins[i];
     const match = chemin.match(pathParts);
@@ -129,7 +158,9 @@ export function matchFirstExact(
   chemins: Array<IChemin>,
   pathname: string | Array<string>,
 ): IFirstExactMatchResult | null {
-  const pathParts = typeof pathname === 'string' ? splitPathname(pathname) : pathname;
+  const pathParts = typeof pathname === "string"
+    ? splitPathname(pathname)
+    : pathname;
   for (let i = 0; i < chemins.length; i++) {
     const chemin = chemins[i];
     const params = chemin.matchExact(pathParts);

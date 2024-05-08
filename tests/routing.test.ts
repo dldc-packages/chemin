@@ -1,14 +1,14 @@
-import { expect, test } from 'vitest';
-import { chemin, matchFirst, pString, partialMatch } from '../src/mod';
+import { expect } from "$std/expect/mod.ts";
+import { chemin, matchFirst, partialMatch, pString } from "../mod.ts";
 
-test('routing', () => {
-  const workspaceBase = chemin('workspace', pString('tenant'));
+Deno.test("routing", () => {
+  const workspaceBase = chemin("workspace", pString("tenant"));
 
   const routes = [
-    chemin('home'), // home
-    chemin('settings'), // settings
-    chemin(workspaceBase, 'home'), // workspace home
-    chemin(workspaceBase, 'settings'), // workspace settings
+    chemin("home"), // home
+    chemin("settings"), // settings
+    chemin(workspaceBase, "home"), // workspace home
+    chemin(workspaceBase, "settings"), // workspace settings
   ];
 
   function app(pathname: string) {
@@ -27,20 +27,20 @@ test('routing', () => {
   }
 
   const results = [
-    '/home',
-    '/yolo',
-    '/settings',
-    '/workspace/yolo/settings',
-    '/workspace/yolo/home',
-    '/workspace/yolo/yolo',
+    "/home",
+    "/yolo",
+    "/settings",
+    "/workspace/yolo/settings",
+    "/workspace/yolo/home",
+    "/workspace/yolo/yolo",
   ].map((pathname) => app(pathname));
 
   expect(results).toEqual([
-    { route: '/home' },
+    { route: "/home" },
     { route: null },
-    { route: '/settings' },
-    { route: '/workspace/:tenant/settings', tenant: 'yolo' },
-    { route: '/workspace/:tenant/home', tenant: 'yolo' },
+    { route: "/settings" },
+    { route: "/workspace/:tenant/settings", tenant: "yolo" },
+    { route: "/workspace/:tenant/home", tenant: "yolo" },
     { route: null },
   ]);
 });

@@ -1,4 +1,8 @@
-import type { ICheminParamBase, TCheminParam, TPartMatchResult } from './types';
+import type {
+  ICheminParamBase,
+  TCheminParam,
+  TPartMatchResult,
+} from "./types.ts";
 
 export function pString<N extends string>(name: N): TCheminParam<N, string> {
   return {
@@ -7,7 +11,7 @@ export function pString<N extends string>(name: N): TCheminParam<N, string> {
     meta: null,
     isEqual: (other) => other.name === name,
     match: (value, ...rest) => {
-      if (typeof value === 'string' && value.length > 0) {
+      if (typeof value === "string" && value.length > 0) {
         return { match: true, value: value, next: rest };
       }
       return { match: false };
@@ -61,11 +65,15 @@ export function pInteger<N extends string>(
       return { match: true, value: parsed, next: rest };
     },
     serialize: (value) => {
-      if (typeof value !== 'number') {
-        throw new Error(`CheminParam.interger expect an interger when serializing`);
+      if (typeof value !== "number") {
+        throw new Error(
+          `CheminParam.interger expect an interger when serializing`,
+        );
       }
       if (Math.round(value) !== value || !Number.isFinite(value)) {
-        throw new Error(`CheminParam.interger expect an interger when serializing`);
+        throw new Error(
+          `CheminParam.interger expect an interger when serializing`,
+        );
       }
       return value.toString();
     },
@@ -100,7 +108,8 @@ export function pOptional<N extends string, T>(
     name: sub.name,
     meta: { sub },
     factory: pOptional,
-    isEqual: (other) => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
+    isEqual: (other) =>
+      sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
     match: (...all) => {
       const subMatch = sub.match(...all);
       if (subMatch.match) {
@@ -137,14 +146,16 @@ export function pOptionalConst<N extends string>(
   };
 }
 
-export function pOptionalString<N extends string>(name: N): TCheminParam<N, string | false> {
+export function pOptionalString<N extends string>(
+  name: N,
+): TCheminParam<N, string | false> {
   return {
     name,
     meta: null,
     factory: pOptionalString,
     isEqual: (other) => other.name === name,
     match: (...all) => {
-      if (typeof all[0] === 'string' && all[0].length > 0) {
+      if (typeof all[0] === "string" && all[0].length > 0) {
         return { match: true, value: all[0], next: all.slice(1) };
       }
       return { match: true, value: false, next: all };
@@ -157,13 +168,18 @@ export function pOptionalString<N extends string>(name: N): TCheminParam<N, stri
 export function pMultiple<N extends string, T, Meta>(
   sub: TCheminParam<N, T, Meta>,
   atLeastOne: boolean = false,
-): TCheminParam<N, Array<T>, { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }> {
+): TCheminParam<
+  N,
+  Array<T>,
+  { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }
+> {
   return {
     name: sub.name,
     meta: { atLeastOne, sub },
     factory: pMultiple,
     isEqual: (other) =>
-      sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) && atLeastOne === other.meta.atLeastOne,
+      sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) &&
+      atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
       let next = all as readonly string[];
@@ -180,8 +196,8 @@ export function pMultiple<N extends string, T, Meta>(
       }
       return { match: true, value: values, next };
     },
-    serialize: (value) => value.map((v) => sub.serialize(v)).join('/'),
-    stringify: () => `${sub.stringify()}${atLeastOne ? '+' : '*'}`,
+    serialize: (value) => value.map((v) => sub.serialize(v)).join("/"),
+    stringify: () => `${sub.stringify()}${atLeastOne ? "+" : "*"}`,
   };
 }
 

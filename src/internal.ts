@@ -1,1 +1,1 @@
-export const IS_CHEMIN = Symbol.for('IS_CHEMIN_INTERNAL');
+export const IS_CHEMIN = Symbol.for("IS_CHEMIN_INTERNAL");

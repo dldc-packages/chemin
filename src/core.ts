@@ -1,11 +1,14 @@
-import { IS_CHEMIN } from './internal';
-import type { IChemin, ICheminMatch, TPart } from './types';
+import { IS_CHEMIN } from "./internal.ts";
+import type { IChemin, ICheminMatch, TPart } from "./types.ts";
 
 export function isChemin(maybe: any): maybe is IChemin<any> {
   return maybe && maybe[IS_CHEMIN];
 }
 
-export function matchPart(part: TPart, pathname: readonly string[]): ICheminMatch<any> | null {
+export function matchPart(
+  part: TPart,
+  pathname: readonly string[],
+): ICheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
     if (match === null) {
@@ -30,12 +33,17 @@ export function matchPart(part: TPart, pathname: readonly string[]): ICheminMatc
   };
 }
 
-export function matchParts(parts: ReadonlyArray<TPart>, pathname: readonly string[]): ICheminMatch<any> | null {
+export function matchParts(
+  parts: ReadonlyArray<TPart>,
+  pathname: readonly string[],
+): ICheminMatch<any> | null {
   if (parts.length === 0) {
     return { params: {}, rest: pathname, exact: pathname.length === 0 };
   }
   const nextPart = parts[0];
-  const nextHasParams = isChemin(nextPart) ? true : !('noValue' in nextPart) || nextPart.noValue !== true;
+  const nextHasParams = isChemin(nextPart)
+    ? true
+    : !("noValue" in nextPart) || nextPart.noValue !== true;
   const res = matchPart(nextPart, pathname);
   if (res === null) {
     return null;

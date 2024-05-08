@@ -1,9 +1,11 @@
-import { expect, test } from 'vitest';
-import { chemin, type TCheminParam } from '../src/mod';
+import { expect } from "$std/expect/mod.ts";
+import { chemin, type TCheminParam } from "../mod.ts";
 
-test('custom matcher', () => {
+Deno.test("custom matcher", () => {
   // match only string of 4 char [a-z0-9]
-  function pFourCharStringId<N extends string>(name: N): TCheminParam<N, string> {
+  function pFourCharStringId<N extends string>(
+    name: N,
+  ): TCheminParam<N, string> {
     const reg = /^[a-z0-9]{4}$/;
     return {
       factory: pFourCharStringId,
@@ -21,8 +23,12 @@ test('custom matcher', () => {
     };
   }
 
-  const path = chemin('item', pFourCharStringId('itemId'));
-  expect(path.match('/item/a4e3t')).toBe(null);
-  expect(path.match('/item/A4e3')).toBe(null);
-  expect(path.match('/item/a4e3')).toEqual({ rest: [], params: { itemId: 'a4e3' }, exact: true });
+  const path = chemin("item", pFourCharStringId("itemId"));
+  expect(path.match("/item/a4e3t")).toBe(null);
+  expect(path.match("/item/A4e3")).toBe(null);
+  expect(path.match("/item/a4e3")).toEqual({
+    rest: [],
+    params: { itemId: "a4e3" },
+    exact: true,
+  });
 });

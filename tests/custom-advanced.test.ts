@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest';
-import { chemin, type TCheminParam } from '../src/mod';
+import { expect } from "$std/expect/mod.ts";
+import { chemin, type TCheminParam } from "../mod.ts";
 
-test('custom advanced', () => {
+Deno.test("custom advanced", () => {
   interface CustomId {
     num: number;
     name: string;
@@ -16,7 +16,7 @@ test('custom advanced', () => {
       meta: null,
       match: (...all) => {
         const next = all[0];
-        const parts = next.split('-');
+        const parts = next.split("-");
         if (parts.length !== 2) {
           return { match: false, next: all };
         }
@@ -24,7 +24,11 @@ test('custom advanced', () => {
         if (Number.isNaN(num)) {
           return { match: false, next: all };
         }
-        return { match: true, value: { num, name: parts[1] }, next: all.slice(1) };
+        return {
+          match: true,
+          value: { num, name: parts[1] },
+          next: all.slice(1),
+        };
       },
       serialize: (value) => {
         return `${value.num}-${value.name}`;
@@ -33,9 +37,13 @@ test('custom advanced', () => {
     };
   }
 
-  const path = chemin('item', pCustomId('itemId'));
+  const path = chemin("item", pCustomId("itemId"));
 
-  const match = path.match('/item/42-etienne');
+  const match = path.match("/item/42-etienne");
 
-  expect(match).toEqual({ params: { itemId: { name: 'etienne', num: 42 } }, rest: [], exact: true });
+  expect(match).toEqual({
+    params: { itemId: { name: "etienne", num: 42 } },
+    rest: [],
+    exact: true,
+  });
 });
