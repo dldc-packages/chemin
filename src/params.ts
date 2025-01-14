@@ -67,7 +67,7 @@ export function pInteger<N extends string>(
   name: N,
   options: {
     strict?: boolean;
-  } = {}
+  } = {},
 ): TCheminParam<N, number, { strict: boolean }> {
   const { strict = true } = options;
   return {
@@ -91,12 +91,12 @@ export function pInteger<N extends string>(
     serialize: (value) => {
       if (typeof value !== "number") {
         throw new Error(
-          `CheminParam.interger expect an interger when serializing`
+          `CheminParam.interger expect an interger when serializing`,
         );
       }
       if (Math.round(value) !== value || !Number.isFinite(value)) {
         throw new Error(
-          `CheminParam.interger expect an interger when serializing`
+          `CheminParam.interger expect an interger when serializing`,
         );
       }
       return value.toString();
@@ -154,7 +154,7 @@ export type OptionalValue<T> = { present: false } | { present: true; value: T };
  * @returns A chemin param
  */
 export function pOptional<N extends string, T>(
-  sub: TCheminParam<N, T, any>
+  sub: TCheminParam<N, T, any>,
 ): TCheminParam<N, OptionalValue<T>, { sub: TCheminParam<N, T, any> }> {
   return {
     name: sub.name,
@@ -196,7 +196,7 @@ export function pOptional<N extends string, T>(
  */
 export function pOptionalConst<N extends string>(
   name: N,
-  constant: string = name
+  constant: string = name,
 ): TCheminParam<N, boolean, { constant: string }> {
   return {
     name,
@@ -228,7 +228,7 @@ export function pOptionalConst<N extends string>(
  * @returns
  */
 export function pOptionalString<N extends string>(
-  name: N
+  name: N,
 ): TCheminParam<N, string | false> {
   return {
     name,
@@ -267,7 +267,7 @@ export function pOptionalString<N extends string>(
  */
 export function pMultiple<N extends string, T, Meta>(
   sub: TCheminParam<N, T, Meta>,
-  atLeastOne: boolean = false
+  atLeastOne: boolean = false,
 ): TCheminParam<
   N,
   Array<T>,
@@ -311,7 +311,7 @@ export function pMultiple<N extends string, T, Meta>(
  */
 export function cheminParamsEqual(
   left: ICheminParamBase<any, any, any>,
-  right: ICheminParamBase<any, any, any>
+  right: ICheminParamBase<any, any, any>,
 ): boolean {
   if (left.factory !== right.factory) {
     return false;

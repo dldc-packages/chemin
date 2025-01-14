@@ -25,7 +25,7 @@ export function isChemin(maybe: any): maybe is IChemin<any> {
  */
 export function matchPart(
   part: TPart,
-  pathname: readonly string[]
+  pathname: readonly string[],
 ): ICheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
@@ -60,7 +60,7 @@ export function matchPart(
  */
 export function matchParts(
   parts: ReadonlyArray<TPart>,
-  pathname: readonly string[]
+  pathname: readonly string[],
 ): ICheminMatch<any> | null {
   if (parts.length === 0) {
     return { params: {}, rest: pathname, exact: pathname.length === 0 };
