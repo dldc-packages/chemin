@@ -1,6 +1,6 @@
 {
   "name": "@dldc/chemin",
-  "version": "12.0.0",
+  "version": "12.0.1",
   "exports": "./mod.ts",
   "imports": {
     "@std/expect": "jsr:@std/expect@^1.0.11"
@@ -14,6 +14,10 @@
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage --html"
   },
   "lint": {
-    "rules": { "exclude": ["no-explicit-any"] }
+    "rules": {
+      "exclude": [
+        "no-explicit-any"
+      ]
+    }
   }
 }
