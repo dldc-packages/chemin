@@ -1,4 +1,4 @@
-import { expect } from "$std/expect/mod.ts";
+import { expect } from "@std/expect";
 import type { IChemin, TCheminMatchMaybe } from "../mod.ts";
 import {
   chemin,
@@ -54,21 +54,30 @@ const data: Array<{
     tests: [
       ["/", null],
       ["", null],
-      ["/admin", {
-        params: { tool: { present: false } },
-        rest: [],
-        exact: true,
-      }],
-      ["/admin/", {
-        params: { tool: { present: false } },
-        rest: [],
-        exact: true,
-      }],
-      ["/admin/home", {
-        params: { tool: { present: true, value: "home" } },
-        rest: [],
-        exact: true,
-      }],
+      [
+        "/admin",
+        {
+          params: { tool: { present: false } },
+          rest: [],
+          exact: true,
+        },
+      ],
+      [
+        "/admin/",
+        {
+          params: { tool: { present: false } },
+          rest: [],
+          exact: true,
+        },
+      ],
+      [
+        "/admin/home",
+        {
+          params: { tool: { present: true, value: "home" } },
+          rest: [],
+          exact: true,
+        },
+      ],
       [
         "/admin/blabla/then",
         {
@@ -139,19 +148,23 @@ Deno.test("serialize options", () => {
   const postFragment = chemin(post, pNumber("postId"));
   const postAdmin = chemin("admin", pString("userId"), postFragment, "edit");
   expect(
-    postAdmin.serialize({ postId: 42, userId: "etienne" }, {
-      leadingSlash: false,
-      trailingSlash: true,
-    }),
-  ).toBe(
-    "admin/etienne/post/42/edit/",
-  );
-  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: true }))
-    .toBe("/");
-  expect(empty.serialize(null, { leadingSlash: true, trailingSlash: true }))
-    .toBe("/");
-  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: false }))
-    .toBe("");
+    postAdmin.serialize(
+      { postId: 42, userId: "etienne" },
+      {
+        leadingSlash: false,
+        trailingSlash: true,
+      },
+    ),
+  ).toBe("admin/etienne/post/42/edit/");
+  expect(
+    empty.serialize(null, { leadingSlash: false, trailingSlash: true }),
+  ).toBe("/");
+  expect(
+    empty.serialize(null, { leadingSlash: true, trailingSlash: true }),
+  ).toBe("/");
+  expect(
+    empty.serialize(null, { leadingSlash: false, trailingSlash: false }),
+  ).toBe("");
 });
 
 Deno.test("stringify", () => {

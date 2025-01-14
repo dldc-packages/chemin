@@ -1,13 +1,31 @@
 import { IS_CHEMIN } from "./internal.ts";
 import type { IChemin, ICheminMatch, TPart } from "./types.ts";
 
+/**
+ * Check wether an object is a `Chemin` or not
+ * Accepts one argument and return `true` if it's a `Chemin`, false otherwise.
+ *
+ * ```ts
+ * isChemin(chemin("admin")); // true
+ * ```
+ *
+ * @param maybe
+ * @returns
+ */
 export function isChemin(maybe: any): maybe is IChemin<any> {
   return maybe && maybe[IS_CHEMIN];
 }
 
+/**
+ * Internal function to match a part against a pathname
+ *
+ * @param part
+ * @param pathname
+ * @returns
+ */
 export function matchPart(
   part: TPart,
-  pathname: readonly string[],
+  pathname: readonly string[]
 ): ICheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
@@ -33,9 +51,16 @@ export function matchPart(
   };
 }
 
+/**
+ * Internal function to match a list of parts against a pathname
+ *
+ * @param parts
+ * @param pathname
+ * @returns
+ */
 export function matchParts(
   parts: ReadonlyArray<TPart>,
-  pathname: readonly string[],
+  pathname: readonly string[]
 ): ICheminMatch<any> | null {
   if (parts.length === 0) {
     return { params: {}, rest: pathname, exact: pathname.length === 0 };

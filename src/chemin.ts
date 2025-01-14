@@ -14,8 +14,23 @@ import { splitPathname } from "./utils.ts";
 
 export const chemin: TCreateChemin = cheminFactory();
 
+/**
+ * Factory function to create a chemin function with different default options.
+ * It returns a function that works exactly like `chemin` but with a default `serialize` / `stringify` options.
+ *
+ * ```ts
+ * const chemin = cheminFactory({ leadingSlash: false });
+ * const user = chemin("user", ":id");
+ * user.serialize({ id: 5 }); // "user/5"
+ * ```
+ *
+ * @param defaultSerializeOptions optional and accepts two `boolean` properties:
+ * - `leadingSlash` (default `true`): Add a slash at the begining
+ * - `trailingSlash` (default: `false`): Add a slash at the end
+ * @returns
+ */
 export function cheminFactory(
-  defaultSerializeOptions: ISlashOptions = {},
+  defaultSerializeOptions: ISlashOptions = {}
 ): TCreateChemin {
   function createChemin<Args extends readonly TIn[]>(
     ...fragments: Args
@@ -34,12 +49,12 @@ export function cheminFactory(
       parts,
       serialize: (params: any = null, options: ISlashOptions = {}) =>
         serialize(chemin, params, { ...defaultSerializeOptions, ...options }),
-      extract:
-        () => (extracted === null ? (extracted = extract(chemin)) : extracted),
+      extract: () =>
+        extracted === null ? (extracted = extract(chemin)) : extracted,
       match: (pathname) => match(chemin, pathname),
       matchExact: (pathname) => matchExact(chemin, pathname),
-      flatten:
-        () => (flattened === null ? (flattened = flatten(chemin)) : flattened),
+      flatten: () =>
+        flattened === null ? (flattened = flatten(chemin)) : flattened,
       stringify: (options: ISlashOptions = {}) =>
         stringify(chemin, { ...defaultSerializeOptions, ...options }),
     };
@@ -55,11 +70,10 @@ export function cheminFactory(
  */
 export function match<Params>(
   chemin: IChemin<Params>,
-  pathname: string | Array<string>,
+  pathname: string | Array<string>
 ): TCheminMatchMaybe<Params> {
-  const pathParts = typeof pathname === "string"
-    ? splitPathname(pathname)
-    : pathname;
+  const pathParts =
+    typeof pathname === "string" ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
@@ -68,7 +82,7 @@ export function match<Params>(
  */
 export function matchExact<Params>(
   chemin: IChemin<Params>,
-  pathname: string | Array<string>,
+  pathname: string | Array<string>
 ): null | Params {
   const matchResult = match(chemin, pathname);
   if (matchResult && matchResult.rest.length === 0) {
@@ -84,12 +98,11 @@ export function serialize<Params>(
   chemin: IChemin<Params>,
   // deno-lint-ignore ban-types
   params: {} extends Params ? null | undefined : Params,
-  options: ISlashOptions = {},
+  options: ISlashOptions = {}
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
-  const paramsResolved: any = params === null || params === undefined
-    ? {}
-    : params;
+  const paramsResolved: any =
+    params === null || params === undefined ? {} : params;
 
   const result = chemin.parts
     .map((part) => {
@@ -119,7 +132,7 @@ export function serialize<Params>(
  */
 export function stringify(
   chemin: IChemin<any>,
-  options: ISlashOptions,
+  options: ISlashOptions
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts

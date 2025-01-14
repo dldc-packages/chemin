@@ -1,4 +1,4 @@
-import { expect } from "$std/expect/mod.ts";
+import { expect } from "@std/expect";
 import { chemin, pInteger, pOptional } from "../mod.ts";
 
 Deno.test("optional", () => {

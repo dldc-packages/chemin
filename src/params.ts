@@ -21,6 +21,18 @@ export function pString<N extends string>(name: N): TCheminParam<N, string> {
   };
 }
 
+/**
+ * Parse a number params using `parseFloat(x)`
+ *
+ * ```ts
+ * const chemin = chemin(pNumber("myNum"));
+ * matchExact(chemin, "/3.1415"); // { myNum: 3.1415 }
+ * ```
+ *
+ * **NOTE**: Because it uses `parseFloat` this will also accept `Infinity`, `10e2`...
+ * @param name The name of the param that will be used in the result object
+ * @returns A chemin param
+ */
 export function pNumber<N extends string>(name: N): TCheminParam<N, number> {
   return {
     name,
@@ -39,11 +51,23 @@ export function pNumber<N extends string>(name: N): TCheminParam<N, number> {
   };
 }
 
+/**
+ * Parse an integer params using `parseInt(x, 10)`
+ *
+ * ```ts
+ * const chemin = chemin(pInteger("myNum"));
+ * matchExact(chemin, "/42"); // { myNum: 42 }
+ * ```
+ *
+ * @param name The name of the param that will be used in the result object
+ * @param options Optional object, accepts a `strict` boolean property (`true` by default). When strict is set to `true` (the default) it will only match if the parsed number is the same as the raw value (so `1.0` or `42blabla` will not match).
+ * @returns A chemin param
+ */
 export function pInteger<N extends string>(
   name: N,
   options: {
     strict?: boolean;
-  } = {},
+  } = {}
 ): TCheminParam<N, number, { strict: boolean }> {
   const { strict = true } = options;
   return {
@@ -67,12 +91,12 @@ export function pInteger<N extends string>(
     serialize: (value) => {
       if (typeof value !== "number") {
         throw new Error(
-          `CheminParam.interger expect an interger when serializing`,
+          `CheminParam.interger expect an interger when serializing`
         );
       }
       if (Math.round(value) !== value || !Number.isFinite(value)) {
         throw new Error(
-          `CheminParam.interger expect an interger when serializing`,
+          `CheminParam.interger expect an interger when serializing`
         );
       }
       return value.toString();
@@ -81,6 +105,19 @@ export function pInteger<N extends string>(
   };
 }
 
+/**
+ * Create a fixed value param
+ *
+ * ```ts
+ * const chemin = chemin(pConstant("home"));
+ * matchExact(chemin, "/home"); // {}
+ * ```
+ *
+ * You usually don't need to use this since you can just use a string directly in the `chemin` function.
+ *
+ * @param name
+ * @returns
+ */
 export function pConstant<N extends string>(name: N): TCheminParam<N, void> {
   return {
     name,
@@ -99,10 +136,25 @@ export function pConstant<N extends string>(name: N): TCheminParam<N, void> {
   };
 }
 
-type OptionalValue<T> = { present: false } | { present: true; value: T };
+/**
+ * The match result for `pOptional` params
+ */
+export type OptionalValue<T> = { present: false } | { present: true; value: T };
 
+/**
+ * Wrap a param to make it optional
+ *
+ * ```ts
+ * const chemin = chemin(pOptional(pInteger("myInt")));
+ * matchExact(chemin, "/42"); // { myInt: { present: true, value: 42 } }
+ * matchExact(chemin, "/"); // { myInt: { present: false } }
+ * ```
+ *
+ * @param sub The param to make optional
+ * @returns A chemin param
+ */
 export function pOptional<N extends string, T>(
-  sub: TCheminParam<N, T, any>,
+  sub: TCheminParam<N, T, any>
 ): TCheminParam<N, OptionalValue<T>, { sub: TCheminParam<N, T, any> }> {
   return {
     name: sub.name,
@@ -126,9 +178,25 @@ export function pOptional<N extends string, T>(
   };
 }
 
+/**
+ * Optional version of `pConstant`
+ * This can also be done with `pOptional(pConstant("home"))` but this has a nicer match result (`true` instead of `{ present: true, value: null }`)
+ *
+ * ```ts
+ * const chemin = chemin(pOptionalConst("isEditing", "edit"));
+ * matchExact(chemin, "/edit"); // { isEditing: true }
+ * matchExact(chemin, "/"); // { isEditing: false }
+ * ```
+ *
+ * If `constant` is omitted then the name is used as the path.
+ *
+ * @param name
+ * @param constant
+ * @returns
+ */
 export function pOptionalConst<N extends string>(
   name: N,
-  constant: string = name,
+  constant: string = name
 ): TCheminParam<N, boolean, { constant: string }> {
   return {
     name,
@@ -146,8 +214,21 @@ export function pOptionalConst<N extends string>(
   };
 }
 
+/**
+ * Optional version of `pString`
+ * This can also be done with `pOptional(pString("name"))` but this has a nicer match result (`"name"` or `false` instead of `{ present: boolean, value: "name" }`)
+ *
+ * ```ts
+ * const chemin = chemin(pOptionalString("name"));
+ * matchExact(chemin, "/paul"); // { name: 'paul' }
+ * matchExact(chemin, "/"); // { name: false }
+ * ```
+ *
+ * @param name
+ * @returns
+ */
 export function pOptionalString<N extends string>(
-  name: N,
+  name: N
 ): TCheminParam<N, string | false> {
   return {
     name,
@@ -165,9 +246,28 @@ export function pOptionalString<N extends string>(
   };
 }
 
+/**
+ * Repeat a param multiple times
+ *
+ * ```ts
+ * const chemin = chemin(pMultiple(pString("categories")));
+ * matchExact(chemin, "/"); // { categories: [] }
+ * matchExact(chemin, "/foo/bar"); // { categories: ['foo', 'bar'] }
+ * ```
+ *
+ * ```ts
+ * const chemin = chemin(pMultiple(pString("categories"), true));
+ * matchExact(chemin, "/"); // false because atLeastOne is true
+ * matchExact(chemin, "/foo/bar"); // { categories: ['foo', 'bar'] }
+ * ```
+ *
+ * @param sub
+ * @param atLeastOne If true then the match will fail if there are no values (default is false)
+ * @returns
+ */
 export function pMultiple<N extends string, T, Meta>(
   sub: TCheminParam<N, T, Meta>,
-  atLeastOne: boolean = false,
+  atLeastOne: boolean = false
 ): TCheminParam<
   N,
   Array<T>,
@@ -178,7 +278,8 @@ export function pMultiple<N extends string, T, Meta>(
     meta: { atLeastOne, sub },
     factory: pMultiple,
     isEqual: (other) =>
-      sub.name === other.name && cheminParamsEqual(other.meta.sub, sub) &&
+      sub.name === other.name &&
+      cheminParamsEqual(other.meta.sub, sub) &&
       atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
       const values: Array<T> = [];
@@ -201,9 +302,16 @@ export function pMultiple<N extends string, T, Meta>(
   };
 }
 
+/**
+ * Compare two chemin params, this will return true if the two params have the same factory and parameters.
+ *
+ * @param left
+ * @param right
+ * @returns
+ */
 export function cheminParamsEqual(
   left: ICheminParamBase<any, any, any>,
-  right: ICheminParamBase<any, any, any>,
+  right: ICheminParamBase<any, any, any>
 ): boolean {
   if (left.factory !== right.factory) {
     return false;

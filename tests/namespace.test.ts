@@ -1,4 +1,4 @@
-import { expect } from "$std/expect/mod.ts";
+import { expect } from "@std/expect";
 import {
   chemin,
   namespace,
@@ -83,15 +83,16 @@ Deno.test("namespace with chemin", () => {
     "/base/:org/:orgId(number)/admin/post/:postId(number)/delete?",
   );
 
-  expect(withNamespace.adminPost.match("/base/yolo/42/admin/post/42/delete"))
-    .toEqual({
-      exact: true,
-      params: {
-        org: "yolo",
-        orgId: 42,
-        delete: { present: true, value: null },
-        postId: 42,
-      },
-      rest: [],
-    });
+  expect(
+    withNamespace.adminPost.match("/base/yolo/42/admin/post/42/delete"),
+  ).toEqual({
+    exact: true,
+    params: {
+      org: "yolo",
+      orgId: 42,
+      delete: { present: true, value: null },
+      postId: 42,
+    },
+    rest: [],
+  });
 });

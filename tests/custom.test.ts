@@ -1,4 +1,4 @@
-import { expect } from "$std/expect/mod.ts";
+import { expect } from "@std/expect";
 import { chemin, type TCheminParam } from "../mod.ts";
 
 Deno.test("custom matcher", () => {
