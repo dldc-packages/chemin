@@ -1,3 +1,5 @@
+import type { TParsedPathname } from "./types.ts";
+
 /**
  * Split a pathname and prevent empty parts
  * Accepts a string and returns an array of strings.
@@ -12,7 +14,7 @@
  * @param pathname
  * @returns
  */
-export function splitPathname(pathname: string): Array<string> {
+export function splitPathname(pathname: string): TParsedPathname {
   const strParts = pathname.split("/");
   if (strParts[0] === "") {
     strParts.shift();

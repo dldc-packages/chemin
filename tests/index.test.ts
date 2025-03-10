@@ -1,5 +1,5 @@
 import { expect } from "@std/expect";
-import type { IChemin, TCheminMatchMaybe } from "../mod.ts";
+import type { TChemin, TCheminMatchMaybe } from "../mod.ts";
 import {
   chemin,
   cheminFactory,
@@ -20,10 +20,12 @@ Deno.test("Serialize chemin", () => {
   expect(c.stringify()).toBe("/admin/:user/:nums(number)*");
 });
 
-const data: Array<{
-  chemin: IChemin;
-  tests: Array<[string, TCheminMatchMaybe<any>]>;
-}> = [
+interface DateItem {
+  chemin: TChemin;
+  tests: [string, TCheminMatchMaybe<any>][];
+}
+
+const data: DateItem[] = [
   {
     chemin: chemin(),
     tests: [

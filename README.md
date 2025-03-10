@@ -193,7 +193,7 @@ console.log(path.match("/item/a4e3")); // { rest: [], exact: true, params: { ite
 
 > Create a `Chemin`
 
-Accepts any number or arguments of type `string`, `TCheminParam` or `IChemin`.
+Accepts any number or arguments of type `string`, `TCheminParam` or `TChemin`.
 
 **Note**: strings are converted to `pConstant`.
 
@@ -248,11 +248,11 @@ properties:
 
 > Test a chemin against a pathname
 
-Returns `null` or `ICheminMatch`.
+Returns `null` or `TCheminMatch`.
 
 - `pathname` can be either a string (`/admin/user/5`) or an array of strings
   (`['admin', 'user', '5']`)
-- `ICheminMatch` is an object with three properties
+- `TCheminMatch` is an object with three properties
   - `rest`: an array of string of the remaining parts of the pathname once the
     matching is done
   - `exact`: a boolean indicating if the match is exact or not (if `rest` is

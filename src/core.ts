@@ -1,5 +1,5 @@
 import { IS_CHEMIN } from "./internal.ts";
-import type { IChemin, ICheminMatch, TPart } from "./types.ts";
+import type { TChemin, TCheminMatch, TPart } from "./types.ts";
 
 /**
  * Check wether an object is a `Chemin` or not
@@ -12,7 +12,7 @@ import type { IChemin, ICheminMatch, TPart } from "./types.ts";
  * @param maybe
  * @returns
  */
-export function isChemin(maybe: any): maybe is IChemin<any> {
+export function isChemin(maybe: any): maybe is TChemin<any> {
   return maybe && maybe[IS_CHEMIN];
 }
 
@@ -26,7 +26,7 @@ export function isChemin(maybe: any): maybe is IChemin<any> {
 export function matchPart(
   part: TPart,
   pathname: readonly string[],
-): ICheminMatch<any> | null {
+): TCheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
     if (match === null) {
@@ -59,9 +59,9 @@ export function matchPart(
  * @returns
  */
 export function matchParts(
-  parts: ReadonlyArray<TPart>,
+  parts: readonly TPart[],
   pathname: readonly string[],
-): ICheminMatch<any> | null {
+): TCheminMatch<any> | null {
   if (parts.length === 0) {
     return { params: {}, rest: pathname, exact: pathname.length === 0 };
   }

@@ -2,13 +2,14 @@ import { isChemin, matchPart } from "./core.ts";
 import { IS_CHEMIN } from "./internal.ts";
 import { cheminParamsEqual, pConstant } from "./params.ts";
 import type {
-  IChemin,
-  ISlashOptions,
+  TChemin,
   TCheminMatchMaybe,
   TCheminParamAny,
   TCreateChemin,
   TIn,
   TPart,
+  TPathname,
+  TSlashOptions,
 } from "./types.ts";
 import { splitPathname } from "./utils.ts";
 
@@ -30,24 +31,24 @@ export const chemin: TCreateChemin = cheminFactory();
  * @returns
  */
 export function cheminFactory(
-  defaultSerializeOptions: ISlashOptions = {},
+  defaultSerializeOptions: TSlashOptions = {},
 ): TCreateChemin {
   function createChemin<Args extends readonly TIn[]>(
     ...fragments: Args
-  ): IChemin<any> {
+  ): TChemin<any> {
     const parts = fragments.map((part) => {
       if (typeof part === "string") {
         return pConstant(part);
       }
       return part;
     });
-    let extracted: Array<IChemin> | null = null;
-    let flattened: Array<TCheminParamAny> | null = null;
+    let extracted: TChemin[] | null = null;
+    let flattened: TCheminParamAny[] | null = null;
 
-    const chemin: IChemin<any> = {
+    const chemin: TChemin<any> = {
       [IS_CHEMIN]: true,
       parts,
-      serialize: (params: any = null, options: ISlashOptions = {}) =>
+      serialize: (params: any = null, options: TSlashOptions = {}) =>
         serialize(chemin, params, { ...defaultSerializeOptions, ...options }),
       extract: () =>
         extracted === null ? (extracted = extract(chemin)) : extracted,
@@ -55,7 +56,7 @@ export function cheminFactory(
       matchExact: (pathname) => matchExact(chemin, pathname),
       flatten: () =>
         flattened === null ? (flattened = flatten(chemin)) : flattened,
-      stringify: (options: ISlashOptions = {}) =>
+      stringify: (options: TSlashOptions = {}) =>
         stringify(chemin, { ...defaultSerializeOptions, ...options }),
     };
 
@@ -69,8 +70,8 @@ export function cheminFactory(
  * Match a chemin against a pathname and return the params
  */
 export function match<Params>(
-  chemin: IChemin<Params>,
-  pathname: string | Array<string>,
+  chemin: TChemin<Params>,
+  pathname: TPathname,
 ): TCheminMatchMaybe<Params> {
   const pathParts = typeof pathname === "string"
     ? splitPathname(pathname)
@@ -82,8 +83,8 @@ export function match<Params>(
  * Match a chemin against a pathname and return the params if the match is exact, otherwise null.
  */
 export function matchExact<Params>(
-  chemin: IChemin<Params>,
-  pathname: string | Array<string>,
+  chemin: TChemin<Params>,
+  pathname: TPathname,
 ): null | Params {
   const matchResult = match(chemin, pathname);
   if (matchResult && matchResult.rest.length === 0) {
@@ -96,10 +97,10 @@ export function matchExact<Params>(
  * Print a chemin from its params.
  */
 export function serialize<Params>(
-  chemin: IChemin<Params>,
+  chemin: TChemin<Params>,
   // deno-lint-ignore ban-types
   params: {} extends Params ? null | undefined : Params,
-  options: ISlashOptions = {},
+  options: TSlashOptions = {},
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const paramsResolved: any = params === null || params === undefined
@@ -133,8 +134,8 @@ export function serialize<Params>(
  * Transform a chemin into a string representation.
  */
 export function stringify(
-  chemin: IChemin<any>,
-  options: ISlashOptions,
+  chemin: TChemin<any>,
+  options: TSlashOptions,
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts
@@ -154,8 +155,8 @@ export function stringify(
 /**
  * Flatten a chemin into an array of chemin params.
  */
-export function flatten(chemin: IChemin): Array<TCheminParamAny> {
-  const result: Array<TCheminParamAny> = [];
+export function flatten(chemin: TChemin): TCheminParamAny[] {
+  const result: TCheminParamAny[] = [];
   function traverse(current: TPart) {
     if (isChemin(current)) {
       result.push(...current.flatten());
@@ -170,8 +171,8 @@ export function flatten(chemin: IChemin): Array<TCheminParamAny> {
 /**
  * Extract all chemins from a chemin including itself.
  */
-export function extract(chemin: IChemin): Array<IChemin> {
-  const result: Array<IChemin> = [chemin];
+export function extract(chemin: TChemin): TChemin[] {
+  const result: TChemin[] = [chemin];
   function traverse(current: TPart) {
     if (isChemin(current)) {
       if (result.indexOf(current) === -1) {
@@ -187,7 +188,7 @@ export function extract(chemin: IChemin): Array<IChemin> {
 /**
  * Test if two chemins are equal.
  */
-export function equal(left: IChemin, right: IChemin): boolean {
+export function equal(left: TChemin, right: TChemin): boolean {
   if (left === right) {
     return true;
   }

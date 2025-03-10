@@ -1,6 +1,6 @@
 import type {
-  ICheminParamBase,
   TCheminParam,
+  TCheminParamBase,
   TPartMatchResult,
 } from "./types.ts";
 
@@ -270,7 +270,7 @@ export function pMultiple<N extends string, T, Meta>(
   atLeastOne: boolean = false,
 ): TCheminParam<
   N,
-  Array<T>,
+  T[],
   { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }
 > {
   return {
@@ -282,7 +282,7 @@ export function pMultiple<N extends string, T, Meta>(
       cheminParamsEqual(other.meta.sub, sub) &&
       atLeastOne === other.meta.atLeastOne,
     match: (...all) => {
-      const values: Array<T> = [];
+      const values: T[] = [];
       let next = all as readonly string[];
       let nextMatch: TPartMatchResult<T>;
       do {
@@ -310,8 +310,8 @@ export function pMultiple<N extends string, T, Meta>(
  * @returns
  */
 export function cheminParamsEqual(
-  left: ICheminParamBase<any, any, any>,
-  right: ICheminParamBase<any, any, any>,
+  left: TCheminParamBase<any, any, any>,
+  right: TCheminParamBase<any, any, any>,
 ): boolean {
   if (left.factory !== right.factory) {
     return false;
