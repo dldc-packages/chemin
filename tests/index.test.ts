@@ -20,12 +20,12 @@ Deno.test("Serialize chemin", () => {
   expect(c.stringify()).toBe("/admin/:user/:nums(number)*");
 });
 
-interface DateItem {
+interface TestItem {
   chemin: TChemin;
   tests: [string, TCheminMatchMaybe<any>][];
 }
 
-const data: DateItem[] = [
+const data: TestItem[] = [
   {
     chemin: chemin(),
     tests: [
