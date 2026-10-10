@@ -23,10 +23,7 @@ export function isChemin(maybe: any): maybe is TChemin<any> {
  * @param pathname
  * @returns
  */
-export function matchPart(
-  part: TPart,
-  pathname: readonly string[],
-): TCheminMatch<any> | null {
+export function matchPart(part: TPart, pathname: readonly string[]): TCheminMatch<any> | null {
   if (isChemin(part)) {
     const match = matchParts(part.parts, pathname);
     if (match === null) {

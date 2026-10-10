@@ -1,12 +1,5 @@
-import { expect } from "@std/expect";
-import {
-  chemin,
-  namespace,
-  pConstant,
-  pNumber,
-  pOptional,
-  pString,
-} from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, namespace, pConstant, pNumber, pOptional, pString } from "@dldc/chemin";
 
 const ROUTES = (() => {
   const home = chemin();
@@ -16,11 +9,7 @@ const ROUTES = (() => {
 
   const post = chemin(home, postFragment);
   const adminHome = chemin(home, "admin");
-  const adminPost = chemin(
-    adminHome,
-    postFragment,
-    pOptional(pConstant("delete")),
-  );
+  const adminPost = chemin(adminHome, postFragment, pOptional(pConstant("delete")));
 
   return {
     home,
@@ -31,16 +20,14 @@ const ROUTES = (() => {
   };
 })();
 
-Deno.test("simple namespace", () => {
+test("simple namespace", () => {
   const withNamespace = namespace("base", ROUTES);
 
   expect(Object.keys(withNamespace)).toEqual(Object.keys(ROUTES));
 
   expect(withNamespace.home.stringify()).toBe("/base");
   expect(withNamespace.posts.stringify()).toBe("/base/posts");
-  expect(withNamespace.adminPost.stringify()).toBe(
-    "/base/admin/post/:postId(number)/delete?",
-  );
+  expect(withNamespace.adminPost.stringify()).toBe("/base/admin/post/:postId(number)/delete?");
   expect(withNamespace.adminPost.match("/base/admin/post/42/delete")).toEqual({
     exact: true,
     params: { delete: { present: true, value: null }, postId: 42 },
@@ -48,15 +35,13 @@ Deno.test("simple namespace", () => {
   });
 });
 
-Deno.test("namespace with param", () => {
+test("namespace with param", () => {
   const withNamespace = namespace(pString("base"), ROUTES);
 
   expect(Object.keys(withNamespace)).toEqual(Object.keys(ROUTES));
   expect(withNamespace.home.stringify()).toBe("/:base");
   expect(withNamespace.posts.stringify()).toBe("/:base/posts");
-  expect(withNamespace.adminPost.stringify()).toBe(
-    "/:base/admin/post/:postId(number)/delete?",
-  );
+  expect(withNamespace.adminPost.stringify()).toBe("/:base/admin/post/:postId(number)/delete?");
   expect(withNamespace.adminPost.match("/yolo/admin/post/42/delete")).toEqual({
     exact: true,
     params: {
@@ -68,24 +53,17 @@ Deno.test("namespace with param", () => {
   });
 });
 
-Deno.test("namespace with chemin", () => {
-  const withNamespace = namespace(
-    chemin("base", pString("org"), pNumber("orgId")),
-    ROUTES,
-  );
+test("namespace with chemin", () => {
+  const withNamespace = namespace(chemin("base", pString("org"), pNumber("orgId")), ROUTES);
 
   expect(Object.keys(withNamespace)).toEqual(Object.keys(ROUTES));
   expect(withNamespace.home.stringify()).toBe("/base/:org/:orgId(number)");
-  expect(withNamespace.posts.stringify()).toBe(
-    "/base/:org/:orgId(number)/posts",
-  );
+  expect(withNamespace.posts.stringify()).toBe("/base/:org/:orgId(number)/posts");
   expect(withNamespace.adminPost.stringify()).toBe(
     "/base/:org/:orgId(number)/admin/post/:postId(number)/delete?",
   );
 
-  expect(
-    withNamespace.adminPost.match("/base/yolo/42/admin/post/42/delete"),
-  ).toEqual({
+  expect(withNamespace.adminPost.match("/base/yolo/42/admin/post/42/delete")).toEqual({
     exact: true,
     params: {
       org: "yolo",

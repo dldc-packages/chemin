@@ -1,7 +1,7 @@
-import { expect } from "@std/expect";
-import { chemin, type TCheminParam } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, type TCheminParam } from "@dldc/chemin";
 
-Deno.test("custom advanced", () => {
+test("custom advanced", () => {
   interface CustomId {
     num: number;
     name: string;

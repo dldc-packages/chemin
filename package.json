@@ -1,0 +1,59 @@
+{
+  "name": "@dldc/chemin",
+  "version": "13.0.0",
+  "description": "Type-safe pattern builder & route matching library",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dldc-packages/chemin.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/mod.d.mts",
+      "default": "./dist/mod.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "test": "vp test run",
+    "test:run": "vp test run",
+    "test:watch": "vp test",
+    "test:coverage": "vp test run --coverage",
+    "check": "vp check",
+    "lint": "vp lint",
+    "format": "vp fmt",
+    "pack": "vp pack",
+    "release:check": "vp check && vp test run && vp pack",
+    "release": "bumpp --execute \"npm run release:check\""
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^5.0.3",
+    "bumpp": "^12.3.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "^1.1.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.11.2",
+      "onFail": "warn"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "26.11.1",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+  }
+}

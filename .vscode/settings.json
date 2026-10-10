@@ -1,5 +1,9 @@
 {
-  "deno.enable": true,
-  "editor.defaultFormatter": "denoland.vscode-deno",
-  "npm.autoDetect": "off"
+  "deno.enable": false,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "npm.autoDetect": "on",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.ts": "explicit",
+    "source.organizeImports": "explicit"
+  }
 }

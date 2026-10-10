@@ -1,7 +1,7 @@
-import { expect } from "@std/expect";
-import { chemin, matchFirst, partialMatch, pString } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, matchFirst, partialMatch, pString } from "@dldc/chemin";
 
-Deno.test("routing", () => {
+test("routing", () => {
   const workspaceBase = chemin("workspace", pString("tenant"));
 
   const routes = [

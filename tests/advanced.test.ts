@@ -1,14 +1,7 @@
-import { expect } from "@std/expect";
-import {
-  chemin,
-  matchAllNested,
-  pConstant,
-  pNumber,
-  pOptional,
-  prefix,
-} from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, matchAllNested, pConstant, pNumber, pOptional, prefix } from "@dldc/chemin";
 
-Deno.test("matchAllNested", () => {
+test("matchAllNested", () => {
   const ROUTES = (() => {
     const home = chemin();
     const posts = chemin(home, "posts");
@@ -17,11 +10,7 @@ Deno.test("matchAllNested", () => {
 
     const post = chemin(home, postFragment);
     const admin = chemin(home, "admin");
-    const adminPost = chemin(
-      admin,
-      postFragment,
-      pOptional(pConstant("delete")),
-    );
+    const adminPost = chemin(admin, postFragment, pOptional(pConstant("delete")));
 
     return {
       home,
@@ -84,7 +73,7 @@ Deno.test("matchAllNested", () => {
   ]);
 });
 
-Deno.test("prefix", () => {
+test("prefix", () => {
   const routes = {
     home: chemin(),
     ...prefix("admin", {

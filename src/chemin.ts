@@ -30,12 +30,8 @@ export const chemin: TCreateChemin = cheminFactory();
  * - `trailingSlash` (default: `false`): Add a slash at the end
  * @returns
  */
-export function cheminFactory(
-  defaultSerializeOptions: TSlashOptions = {},
-): TCreateChemin {
-  function createChemin<Args extends readonly TIn[]>(
-    ...fragments: Args
-  ): TChemin<any> {
+export function cheminFactory(defaultSerializeOptions: TSlashOptions = {}): TCreateChemin {
+  function createChemin<Args extends readonly TIn[]>(...fragments: Args): TChemin<any> {
     const parts = fragments.map((part) => {
       if (typeof part === "string") {
         return pConstant(part);
@@ -50,12 +46,10 @@ export function cheminFactory(
       parts,
       serialize: (params: any = null, options: TSlashOptions = {}) =>
         serialize(chemin, params, { ...defaultSerializeOptions, ...options }),
-      extract: () =>
-        extracted === null ? (extracted = extract(chemin)) : extracted,
+      extract: () => (extracted === null ? (extracted = extract(chemin)) : extracted),
       match: (pathname) => match(chemin, pathname),
       matchExact: (pathname) => matchExact(chemin, pathname),
-      flatten: () =>
-        flattened === null ? (flattened = flatten(chemin)) : flattened,
+      flatten: () => (flattened === null ? (flattened = flatten(chemin)) : flattened),
       stringify: (options: TSlashOptions = {}) =>
         stringify(chemin, { ...defaultSerializeOptions, ...options }),
     };
@@ -73,19 +67,14 @@ export function match<Params>(
   chemin: TChemin<Params>,
   pathname: TPathname,
 ): TCheminMatchMaybe<Params> {
-  const pathParts = typeof pathname === "string"
-    ? splitPathname(pathname)
-    : pathname;
+  const pathParts = typeof pathname === "string" ? splitPathname(pathname) : pathname;
   return matchPart(chemin, pathParts);
 }
 
 /**
  * Match a chemin against a pathname and return the params if the match is exact, otherwise null.
  */
-export function matchExact<Params>(
-  chemin: TChemin<Params>,
-  pathname: TPathname,
-): null | Params {
+export function matchExact<Params>(chemin: TChemin<Params>, pathname: TPathname): null | Params {
   const matchResult = match(chemin, pathname);
   if (matchResult && matchResult.rest.length === 0) {
     return matchResult.params;
@@ -103,9 +92,7 @@ export function serialize<Params>(
   options: TSlashOptions = {},
 ): string {
   const { leadingSlash = true, trailingSlash = false } = options;
-  const paramsResolved: any = params === null || params === undefined
-    ? {}
-    : params;
+  const paramsResolved: any = params === null || params === undefined ? {} : params;
 
   const result = chemin.parts
     .map((part) => {
@@ -133,10 +120,7 @@ export function serialize<Params>(
 /**
  * Transform a chemin into a string representation.
  */
-export function stringify(
-  chemin: TChemin<any>,
-  options: TSlashOptions,
-): string {
+export function stringify(chemin: TChemin<any>, options: TSlashOptions): string {
   const { leadingSlash = true, trailingSlash = false } = options;
   const result = chemin.parts
     .map((part): string => {

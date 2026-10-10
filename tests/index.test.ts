@@ -1,5 +1,5 @@
-import { expect } from "@std/expect";
-import type { TChemin, TCheminMatchMaybe } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import type { TChemin, TCheminMatchMaybe } from "@dldc/chemin";
 import {
   chemin,
   cheminFactory,
@@ -13,9 +13,9 @@ import {
   pOptionalString,
   pString,
   splitPathname,
-} from "../mod.ts";
+} from "@dldc/chemin";
 
-Deno.test("Serialize chemin", () => {
+test("Serialize chemin", () => {
   const c = chemin("admin", pString("user"), pMultiple(pNumber("nums")));
   expect(c.stringify()).toBe("/admin/:user/:nums(number)*");
 });
@@ -94,13 +94,13 @@ const data: TestItem[] = [
 
 data.forEach((data) => {
   data.tests.forEach((v) => {
-    Deno.test(`Test ${data.chemin.stringify()} -> '${v[0]}'`, () => {
+    test(`Test ${data.chemin.stringify()} -> '${v[0]}'`, () => {
       expect(data.chemin.match(v[0])).toEqual(v[1]);
     });
   });
 });
 
-Deno.test("matchExact -> empty chemin", () => {
+test("matchExact -> empty chemin", () => {
   const empty = chemin();
 
   expect(empty.matchExact("")).toEqual({});
@@ -108,7 +108,7 @@ Deno.test("matchExact -> empty chemin", () => {
   expect(empty.matchExact("/foo")).toEqual(null);
 });
 
-Deno.test("matchExact -> optional /foo/bar?", () => {
+test("matchExact -> optional /foo/bar?", () => {
   const c = chemin("foo", pOptionalConst("bar"));
 
   expect(c.matchExact("/foo")).toEqual({ bar: false });
@@ -116,7 +116,7 @@ Deno.test("matchExact -> optional /foo/bar?", () => {
   expect(c.matchExact("/foo/bar/baz")).toEqual(null);
 });
 
-Deno.test("extract chemins", () => {
+test("extract chemins", () => {
   const empty = chemin();
   const post = chemin(empty, pConstant("post"));
   const postFragment = chemin(post, pNumber("postId"));
@@ -130,7 +130,7 @@ Deno.test("extract chemins", () => {
   expect(result[3]).toBe(empty);
 });
 
-Deno.test("serialize", () => {
+test("serialize", () => {
   const empty = chemin();
   const post = chemin(empty, pConstant("post"));
   const postFragment = chemin(post, pNumber("postId"));
@@ -144,7 +144,7 @@ Deno.test("serialize", () => {
   );
 });
 
-Deno.test("serialize options", () => {
+test("serialize options", () => {
   const empty = chemin();
   const post = chemin(empty, pConstant("post"));
   const postFragment = chemin(post, pNumber("postId"));
@@ -158,18 +158,12 @@ Deno.test("serialize options", () => {
       },
     ),
   ).toBe("admin/etienne/post/42/edit/");
-  expect(
-    empty.serialize(null, { leadingSlash: false, trailingSlash: true }),
-  ).toBe("/");
-  expect(
-    empty.serialize(null, { leadingSlash: true, trailingSlash: true }),
-  ).toBe("/");
-  expect(
-    empty.serialize(null, { leadingSlash: false, trailingSlash: false }),
-  ).toBe("");
+  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: true })).toBe("/");
+  expect(empty.serialize(null, { leadingSlash: true, trailingSlash: true })).toBe("/");
+  expect(empty.serialize(null, { leadingSlash: false, trailingSlash: false })).toBe("");
 });
 
-Deno.test("stringify", () => {
+test("stringify", () => {
   const empty = chemin();
   const post = chemin(empty, pConstant("post"));
   const postFragment = chemin(post, pNumber("postId"));
@@ -177,12 +171,10 @@ Deno.test("stringify", () => {
   expect(empty.stringify()).toBe("/");
   expect(post.stringify()).toBe("/post");
   expect(postFragment.stringify()).toBe("/post/:postId(number)");
-  expect(postAdmin.stringify()).toBe(
-    "/admin/:userId/post/:postId(number)/edit",
-  );
+  expect(postAdmin.stringify()).toBe("/admin/:userId/post/:postId(number)/edit");
 });
 
-Deno.test("createCreator", () => {
+test("createCreator", () => {
   const chemin = cheminFactory({
     leadingSlash: false,
     trailingSlash: true,
@@ -199,14 +191,14 @@ Deno.test("createCreator", () => {
   );
 });
 
-Deno.test("extract twice should return the same array", () => {
+test("extract twice should return the same array", () => {
   const c = chemin("foo", "bar", pOptionalConst("baz"));
   const ext1 = c.extract();
   const ext2 = c.extract();
   expect(ext1).toBe(ext2);
 });
 
-Deno.test("match usung splitPathname", () => {
+test("match usung splitPathname", () => {
   const c = chemin("foo", "bar", pOptionalConst("baz"));
   const parts = splitPathname("/foo/bar");
   expect(c.match(parts)).toEqual({
@@ -216,34 +208,28 @@ Deno.test("match usung splitPathname", () => {
   });
 });
 
-Deno.test("splitPathname without trainlingSlash", () => {
+test("splitPathname without trainlingSlash", () => {
   const parts = splitPathname("foo/bar");
   expect(parts).toEqual(["foo", "bar"]);
 });
 
-Deno.test("serialize/stringify with option", () => {
+test("serialize/stringify with option", () => {
   const c = chemin("foo", "bar", pOptionalConst("baz"));
-  expect(c.serialize({ baz: true }, { trailingSlash: true })).toEqual(
-    "/foo/bar/baz/",
-  );
+  expect(c.serialize({ baz: true }, { trailingSlash: true })).toEqual("/foo/bar/baz/");
   expect(c.stringify({ trailingSlash: true })).toEqual("/foo/bar/baz?/");
 });
 
-Deno.test("serialize composed", () => {
+test("serialize composed", () => {
   const c = chemin(chemin("foo", "bar"), pOptionalConst("baz"));
-  expect(c.serialize({ baz: true }, { trailingSlash: true })).toEqual(
-    "/foo/bar/baz/",
-  );
+  expect(c.serialize({ baz: true }, { trailingSlash: true })).toEqual("/foo/bar/baz/");
 });
 
-Deno.test("use the same chemin twice", () => {
+test("use the same chemin twice", () => {
   const base = chemin("foo", "bar");
   const c = chemin(base, base);
   expect(c.serialize()).toEqual("/foo/bar/foo/bar");
   expect(c.extract().length).toEqual(2);
-  expect(c.serialize(null, { trailingSlash: true })).toEqual(
-    "/foo/bar/foo/bar/",
-  );
+  expect(c.serialize(null, { trailingSlash: true })).toEqual("/foo/bar/foo/bar/");
   expect(c.match("/foo/bar/foo/bar")).toEqual({
     params: {},
     rest: [],
@@ -252,7 +238,7 @@ Deno.test("use the same chemin twice", () => {
   expect(c.match("/foo/bar")).toEqual(null);
 });
 
-Deno.test("build-in CheminParams -> constant", () => {
+test("build-in CheminParams -> constant", () => {
   const c = chemin(pConstant("foo"));
   expect(c.match("/")).toEqual(null);
   expect(c.match("/foo")).toEqual({ params: {}, rest: [], exact: true });
@@ -266,7 +252,7 @@ Deno.test("build-in CheminParams -> constant", () => {
   expect(c.serialize()).toEqual("/foo");
 });
 
-Deno.test("build-in CheminParams -> integer", () => {
+test("build-in CheminParams -> integer", () => {
   const c = chemin(pInteger("num"));
   expect(c.match("/45")).toEqual({
     params: { num: 45 },
@@ -302,7 +288,7 @@ Deno.test("build-in CheminParams -> integer", () => {
   expect(c.stringify()).toEqual("/:num(interger)");
 });
 
-Deno.test("build-in CheminParams -> integer (strict: false)", () => {
+test("build-in CheminParams -> integer (strict: false)", () => {
   const c = chemin(pInteger("num", { strict: false }));
   expect(c.match("/")).toEqual(null);
   expect(c.match("/45")).toEqual({
@@ -349,7 +335,7 @@ Deno.test("build-in CheminParams -> integer (strict: false)", () => {
   expect(c.serialize({ num: 3 })).toEqual("/3");
 });
 
-Deno.test("build-in CheminParams -> number", () => {
+test("build-in CheminParams -> number", () => {
   const c = chemin(pNumber("num"));
   expect(c.match("/")).toEqual(null);
   expect(c.match("/45")).toEqual({
@@ -401,7 +387,7 @@ Deno.test("build-in CheminParams -> number", () => {
   expect(c.serialize({ num: 3.1415 })).toEqual("/3.1415");
 });
 
-Deno.test("build-in CheminParams -> string", () => {
+test("build-in CheminParams -> string", () => {
   const c = chemin(pString("str"));
   expect(c.match("/")).toEqual(null);
   expect(c.match("/foo")).toEqual({
@@ -423,7 +409,7 @@ Deno.test("build-in CheminParams -> string", () => {
   expect(c.serialize({ str: "hey" })).toEqual("/hey");
 });
 
-Deno.test("build-in CheminParams -> optional", () => {
+test("build-in CheminParams -> optional", () => {
   const c = chemin(pOptional(pInteger("num")));
   expect(c.match("/")).toEqual({
     params: { num: { present: false } },
@@ -460,7 +446,7 @@ Deno.test("build-in CheminParams -> optional", () => {
   expect(c.stringify()).toEqual("/:num(interger)?");
 });
 
-Deno.test("build-in CheminParams -> optionalConst", () => {
+test("build-in CheminParams -> optionalConst", () => {
   const c = chemin(pOptionalConst("str", "some-string"));
   expect(c.match("/")).toEqual({
     params: { str: false },
@@ -492,7 +478,7 @@ Deno.test("build-in CheminParams -> optionalConst", () => {
   expect(c.stringify()).toEqual("/some-string?");
 });
 
-Deno.test("build-in CheminParams -> optionalString", () => {
+test("build-in CheminParams -> optionalString", () => {
   const c = chemin(pOptionalString("str"));
   expect(c.match("/")).toEqual({
     params: { str: false },
@@ -524,7 +510,7 @@ Deno.test("build-in CheminParams -> optionalString", () => {
   expect(c.stringify()).toEqual("/:str?");
 });
 
-Deno.test("build-in CheminParams -> multiple", () => {
+test("build-in CheminParams -> multiple", () => {
   const c = chemin(pMultiple(pString("categories")));
   expect(c.match("/")).toEqual({
     params: { categories: [] },
@@ -556,7 +542,7 @@ Deno.test("build-in CheminParams -> multiple", () => {
   expect(c.stringify()).toEqual("/:categories*");
 });
 
-Deno.test("build-in CheminParams -> multiple (atLeastOne: true)", () => {
+test("build-in CheminParams -> multiple (atLeastOne: true)", () => {
   const c = chemin(pMultiple(pString("categories"), true));
   expect(c.match("/")).toEqual(null);
   expect(c.match("")).toEqual(null);
@@ -579,7 +565,7 @@ Deno.test("build-in CheminParams -> multiple (atLeastOne: true)", () => {
   expect(c.stringify()).toEqual("/:categories+");
 });
 
-Deno.test("equal", () => {
+test("equal", () => {
   expect(equal(chemin(), chemin())).toBe(true);
   expect(equal(chemin("foo"), chemin("foo"))).toBe(true);
   const c = chemin(pInteger("num"));
@@ -615,7 +601,7 @@ Deno.test("equal", () => {
   ).toBe(true);
 });
 
-Deno.test("cheminEqual => false", () => {
+test("cheminEqual => false", () => {
   expect(equal(chemin("foo"), chemin("bar"))).toBe(false);
   expect(equal(chemin("foo", "hey"), chemin("bar"))).toBe(false);
   expect(equal(chemin(pNumber("num")), chemin(pInteger("num")))).toBe(false);

@@ -1,7 +1,7 @@
-import { expect } from "@std/expect";
-import { chemin, matchAll, pString, splitPathname } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, matchAll, pString, splitPathname } from "@dldc/chemin";
 
-Deno.test("Example", () => {
+test("Example", () => {
   const chemins = {
     home: chemin("home"),
     workspace: chemin("workspace", pString("tenant")),
@@ -16,7 +16,7 @@ Deno.test("Example", () => {
   });
 });
 
-Deno.test("matchAll", () => {
+test("matchAll", () => {
   const ROUTES = {
     home: chemin(),
     login: chemin("login"),

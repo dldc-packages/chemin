@@ -1,11 +1,9 @@
-import { expect } from "@std/expect";
-import { chemin, type TCheminParam } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, type TCheminParam } from "@dldc/chemin";
 
-Deno.test("custom matcher", () => {
+test("custom matcher", () => {
   // match only string of 4 char [a-z0-9]
-  function pFourCharStringId<N extends string>(
-    name: N,
-  ): TCheminParam<N, string> {
+  function pFourCharStringId<N extends string>(name: N): TCheminParam<N, string> {
     const reg = /^[a-z0-9]{4}$/;
     return {
       factory: pFourCharStringId,

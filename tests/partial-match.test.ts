@@ -1,18 +1,14 @@
-import { expect } from "@std/expect";
-import { chemin, partialMatch, pString } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, partialMatch, pString } from "@dldc/chemin";
 
-Deno.test("Example", () => {
+test("Example", () => {
   const workspace = chemin("workspace", pString("tenant"));
 
   const home = chemin("home");
   const workspaceHome = chemin(workspace, "home");
   const workspaceSettings = chemin(workspace, "settings");
 
-  const match1 = partialMatch(
-    workspaceHome,
-    workspaceHome.match("/workspace/123/home"),
-    workspace,
-  );
+  const match1 = partialMatch(workspaceHome, workspaceHome.match("/workspace/123/home"), workspace);
   // match1 is typed as { tenant: string } | null
   expect(match1).toMatchObject({ tenant: "123" });
 
@@ -27,7 +23,7 @@ Deno.test("Example", () => {
   expect(match3).toBe(null);
 });
 
-Deno.test("partial match", () => {
+test("partial match", () => {
   const userPart = chemin("user", pString("id"));
 
   const route1 = chemin("admin", pString("id"), userPart, "demo");

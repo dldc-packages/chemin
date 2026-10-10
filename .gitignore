@@ -7,6 +7,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 
 *.tsbuildinfo
 coverage
@@ -16,3 +17,7 @@ jspm_packages/
 .env.test
 
 dist
+
+# Vitest artifacts
+.vitest/
+*.tgz

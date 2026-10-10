@@ -1,8 +1,4 @@
-import type {
-  TCheminParam,
-  TCheminParamBase,
-  TPartMatchResult,
-} from "./types.ts";
+import type { TCheminParam, TCheminParamBase, TPartMatchResult } from "./types.ts";
 
 export function pString<N extends string>(name: N): TCheminParam<N, string> {
   return {
@@ -90,14 +86,10 @@ export function pInteger<N extends string>(
     },
     serialize: (value) => {
       if (typeof value !== "number") {
-        throw new Error(
-          `CheminParam.interger expect an interger when serializing`,
-        );
+        throw new Error(`CheminParam.interger expect an interger when serializing`);
       }
       if (Math.round(value) !== value || !Number.isFinite(value)) {
-        throw new Error(
-          `CheminParam.interger expect an interger when serializing`,
-        );
+        throw new Error(`CheminParam.interger expect an interger when serializing`);
       }
       return value.toString();
     },
@@ -160,8 +152,7 @@ export function pOptional<N extends string, T>(
     name: sub.name,
     meta: { sub },
     factory: pOptional,
-    isEqual: (other) =>
-      sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
+    isEqual: (other) => sub.name === other.name && cheminParamsEqual(sub, other.meta.sub),
     match: (...all) => {
       const subMatch = sub.match(...all);
       if (subMatch.match) {
@@ -227,9 +218,7 @@ export function pOptionalConst<N extends string>(
  * @param name
  * @returns
  */
-export function pOptionalString<N extends string>(
-  name: N,
-): TCheminParam<N, string | false> {
+export function pOptionalString<N extends string>(name: N): TCheminParam<N, string | false> {
   return {
     name,
     meta: null,
@@ -268,11 +257,7 @@ export function pOptionalString<N extends string>(
 export function pMultiple<N extends string, T, Meta>(
   sub: TCheminParam<N, T, Meta>,
   atLeastOne: boolean = false,
-): TCheminParam<
-  N,
-  T[],
-  { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }
-> {
+): TCheminParam<N, T[], { sub: TCheminParam<N, T, Meta>; atLeastOne: boolean }> {
   return {
     name: sub.name,
     meta: { atLeastOne, sub },

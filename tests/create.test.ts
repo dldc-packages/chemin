@@ -1,13 +1,8 @@
-import { expect } from "@std/expect";
-import { chemin, pNumber, pOptionalConst } from "../mod.ts";
+import { expect, test } from "vite-plus/test";
+import { chemin, pNumber, pOptionalConst } from "@dldc/chemin";
 
-Deno.test("create", () => {
-  const c = chemin(
-    "admin",
-    "post",
-    pNumber("postId"),
-    pOptionalConst("delete"),
-  );
+test("create", () => {
+  const c = chemin("admin", "post", pNumber("postId"), pOptionalConst("delete"));
 
   expect(c.match("/no/valid")).toBe(null);
   expect(c.match("/admin/post/45")).toEqual({

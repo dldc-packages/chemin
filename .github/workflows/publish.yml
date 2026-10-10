@@ -2,21 +2,32 @@ name: Publish
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for npm OIDC trusted publishing
     steps:
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
+      - uses: voidzero-dev/setup-vp@v1.21.2
         with:
-          deno-version: v2.x
-
-      - run: deno task check
-
-      - run: npx jsr publish
+          # Node + package manager resolve from package.json `devEngines`.
+          # No `registry-url`: on v1.21.2 it writes an `_authToken=${NODE_AUTH_TOKEN}`
+          # line to .npmrc. With no token set it expands to empty, which stops the
+          # npm CLI from ever initiating the OIDC exchange (ENEEDAUTH). Trusted
+          # publishing needs no registry auth config at all.
+          # No dependency cache in release builds (npm's own recommendation).
+          cache: false
+      - run: vp check
+      - run: vp test run
+      - run: vp pack
+      # Publishes via npm OIDC trusted publishing: the npm CLI (bundled with
+      # Node 26, >= 11.5.1) detects the GitHub Actions OIDC environment and
+      # exchanges the short-lived ID token for a publish token. No NODE_AUTH_TOKEN
+      # needed.
+      - name: Publish to npm (trusted publishing)
+        run: npm publish --access public
