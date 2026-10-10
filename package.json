@@ -1,6 +1,6 @@
 {
   "name": "@dldc/chemin",
-  "version": "13.0.0",
+  "version": "13.0.1",
   "description": "Type-safe pattern builder & route matching library",
   "license": "MIT",
   "repository": {
