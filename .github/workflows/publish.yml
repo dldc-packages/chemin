@@ -13,7 +13,7 @@ jobs:
       id-token: write # Required for npm OIDC trusted publishing
     steps:
       - uses: actions/checkout@v4
-      - uses: voidzero-dev/setup-vp@v1.21.2
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
           # Node + package manager resolve from package.json `devEngines`.
           # No `registry-url`: on v1.21.2 it writes an `_authToken=${NODE_AUTH_TOKEN}`
